@@ -3,6 +3,7 @@ import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { LessonPlan, MindMapData, MindMapMode, PresentationScript, ContentResult, CharacterProfile, AppMode, ImageRatio, SpeechEvaluation, AiProvider, PreservedExam, ExamQuestion, ExamSection, ExamQuestionType } from "../types";
 import { ensureCompletePracticeContent } from "../utils/practiceBuilder";
 import { validateAndSanitizeLessonPlan } from "../utils/contentValidator";
+import { isDemoMode } from "./demoBoot";
 
 export { ensureCompletePracticeContent, validateAndSanitizeLessonPlan };
 
@@ -19,6 +20,12 @@ const PROVIDER_STORAGE = 'google_ai_provider';
 const PROVIDER_SOURCE_STORAGE = 'google_ai_provider_selection_source';
 const MODEL_STORAGE = 'mrs_dung_selected_model';
 const LEGACY_KEY_STORAGE = 'mrs_dung_api_key'; // For backward compatibility
+
+// Bản demo: khi người dùng không tự nhập key, mọi yêu cầu Gemini đi qua trạm trung chuyển /api/gemini
+// (key thật của trung tâm nằm trên máy chủ Vercel, không bao giờ xuống trình duyệt)
+export const DEMO_PROXY_KEY = 'demo-proxy';
+export const isDemoProxyKey = (key?: string | null) => key === DEMO_PROXY_KEY;
+const demoProxyBaseUrl = () => `${window.location.origin}/api/gemini`;
 
 // Provider helpers
 export const getAiProvider = (): AiProvider => {
@@ -50,7 +57,7 @@ export const getApiKeyForProvider = (provider: AiProvider): string => {
     localStorage.setItem(GEMINI_KEY_STORAGE, legacyKey);
     return legacyKey;
   }
-  return '';
+  return isDemoMode() ? DEMO_PROXY_KEY : '';
 };
 
 export const setApiKeyForProvider = (provider: AiProvider, key: string): void => {
@@ -184,8 +191,11 @@ export const fetchAvailableModels = async (apiKey: string): Promise<{ ok: boolea
     const ids: string[] = [];
     let pageToken = '';
     for (let page = 0; page < 5; page++) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
-      const res = await fetch(url, { headers: { 'x-goog-api-key': key } });
+      const viaProxy = isDemoProxyKey(key);
+      const url = viaProxy
+        ? `${demoProxyBaseUrl()}/v1beta/models`
+        : `https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
+      const res = await fetch(url, viaProxy ? {} : { headers: { 'x-goog-api-key': key } });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         const msg = data?.error?.message || `HTTP ${res.status}`;
@@ -211,7 +221,7 @@ export const fetchAvailableModels = async (apiKey: string): Promise<{ ok: boolea
 /** Gọi thử 1 câu rất ngắn để chắc chắn key + model tạo được nội dung */
 export const testGenerateWithModel = async (apiKey: string, model: string): Promise<{ ok: boolean; error?: string }> => {
   try {
-    const client = new GoogleGenAI({ apiKey: apiKey.trim() });
+    const client = createGoogleAiClient(apiKey.trim(), 'gemini');
     const r = await client.models.generateContent({ model, contents: 'Reply with exactly: OK' });
     return { ok: !!(r.text || '').trim() };
   } catch (e: any) {
@@ -225,6 +235,9 @@ export const createGoogleAiClient = (
   apiKey: string,
   provider: AiProvider = getAiProvider()
 ): GoogleGenAI => {
+  if (isDemoProxyKey(apiKey)) {
+    return new GoogleGenAI({ apiKey, httpOptions: { baseUrl: demoProxyBaseUrl() } });
+  }
   if (provider === 'agent-platform') {
     // Flag for Agent Platform endpoint aiplatform.googleapis.com
     return new GoogleGenAI({ vertexai: true, apiKey });
@@ -254,6 +267,12 @@ export type ApiErrorType =
 export const parseApiError = (error: any): { type: ApiErrorType; message: string } => {
   const msg = error?.message || (typeof error === 'string' ? error : JSON.stringify(error)) || '';
   const lower = msg.toLowerCase();
+
+  // Thông báo riêng của trạm trung chuyển bản demo → hiện nguyên văn
+  const demoMsg = msg.match(/Bản demo[^"}\\]*/);
+  if (demoMsg) {
+    return { type: msg.includes('RESOURCE_EXHAUSTED') ? 'QUOTA_EXCEEDED' : 'PERMISSION_DENIED', message: demoMsg[0].trim() };
+  }
 
   if (
     lower.includes('429') ||
@@ -344,6 +363,10 @@ export const callWithFallback = async <T>(
     ? ['gemini-2.5-flash', 'gemini-2.5-flash-lite']
     : ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash'];
 
+  // Bản demo dùng trạm trung chuyển: hỏi trước danh sách model mà key của trung tâm gọi được
+  if (isDemoProxyKey(apiKey) && !getCachedAvailableModels(provider)) {
+    await fetchAvailableModels(apiKey);
+  }
   // Nếu đã dò được danh sách model mà key gọi được → chỉ dùng các model đó (model chọn trước, rồi theo xếp hạng)
   const available = getCachedAvailableModels(provider);
   const orderedModels = available

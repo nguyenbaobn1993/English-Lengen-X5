@@ -11,8 +11,10 @@ import {
   isValidGoogleAiApiKey,
   fetchAvailableModels,
   testGenerateWithModel,
-  getCachedAvailableModels
+  getCachedAvailableModels,
+  isDemoProxyKey
 } from '../services/geminiService';
+import { isDemoMode } from '../services/demoBoot';
 import { getCurrentUser } from '../services/authService';
 import { TeacherAccountsPanel, MyTeacherPasswordPanel } from './teacher/TeacherAccountsPanel';
 import { getFirebaseConfig, saveFirebaseConfig, clearFirebaseConfig, testFirebaseConnection } from '../services/firebaseService';
@@ -65,7 +67,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
     if (isOpen) {
       const currentProvider = getAiProvider();
       setProvider(currentProvider);
-      setGeminiKey(getApiKeyForProvider('gemini'));
+      const gk = getApiKeyForProvider('gemini');
+      setGeminiKey(isDemoProxyKey(gk) ? '' : gk);
       setAgentPlatformKey(getApiKeyForProvider('agent-platform'));
       setModel(getSelectedModel());
       setDiscoveredModels(getCachedAvailableModels('gemini'));
@@ -375,6 +378,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
                 )}
               </div>
             </div>
+
+            {isDemoMode() && (
+              <div className="p-3 rounded-2xl bg-highlight-300/20 border border-highlight-400 text-xs text-brand-900 leading-relaxed">
+                <b>🧪 Bản demo đã bật sẵn AI</b> — để trống ô key là dùng AI của trung tâm (giới hạn lượt mỗi giờ).
+                Nhập key riêng nếu muốn dùng không giới hạn.
+              </div>
+            )}
 
             {/* Kiểm tra key & dò model */}
             {provider === 'gemini' && (
