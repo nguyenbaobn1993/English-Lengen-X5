@@ -102,7 +102,7 @@ const FlashcardGame: React.FC<{ items: VocabularyItem[] }> = ({ items }) => {
              
              <div className="flex-1 flex flex-col items-center justify-center w-full">
                 <span className="text-4xl md:text-5xl font-black text-slate-800 mb-4 tracking-tighter text-center break-words w-full">{current.word}</span>
-                {current.ipa && <span className="text-base text-brand-600 font-mono bg-brand-50 px-3 py-1 rounded-lg border border-brand-100 shadow-sm">/{current.ipa}/</span>}
+                {current.ipa && <span className="text-base text-brand-600 font-mono bg-brand-50 px-3 py-1 rounded-lg border border-brand-100 shadow-sm">/{String(current.ipa).replace(/^\/+|\/+$/g, '')}/</span>}
                 <button 
                   onClick={(e) => handlePlayAudio(current.word, e)}
                   className="mt-8 p-4 rounded-full bg-brand-400 text-white hover:bg-brand-500 transition-all transform hover:scale-110 shadow-lg"

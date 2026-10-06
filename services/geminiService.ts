@@ -152,7 +152,7 @@ const keyTail = (key: string) => (key || '').trim().slice(-6);
 
 /** Model dùng được cho việc tạo nội dung chữ (bỏ model ảnh, giọng nói, embedding, live...) */
 const isTextGenerationModel = (id: string) =>
-  /^gemini-/.test(id) && !/(tts|image|embedding|live|audio|native|vision|aqa|robotics|computer-use|exp-\d)/.test(id);
+  /^gemini-/.test(id) && !/(tts|image|embedding|live|audio|native|vision|aqa|robotics|computer-use|transcribe|omni|nano-banana|customtools|exp-\d)/.test(id);
 
 /** Điểm xếp hạng: phiên bản mới hơn trước, flash > flash-lite > pro (nhanh & có hạn mức miễn phí rộng hơn) */
 const modelRank = (id: string) => {

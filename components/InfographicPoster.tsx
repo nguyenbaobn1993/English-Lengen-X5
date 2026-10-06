@@ -115,7 +115,7 @@ export const InfographicPoster: React.FC<InfographicPosterProps> = ({ lesson }) 
                               <span className="text-4xl w-16 h-16 bg-white rounded-xl flex items-center justify-center shadow-md shrink-0 border-2 border-brand-100">{item.emoji}</span>
                               <div className="flex-1 leading-tight overflow-hidden">
                                   <p className="font-black text-brand-900 text-lg truncate">{item.word}</p>
-                                  <p className="text-xs font-mono text-brand-400">/{item.ipa}/</p>
+                                  <p className="text-xs font-mono text-brand-400">/{String(item.ipa || '').replace(/^\/+|\/+$/g, '')}/</p>
                                   <p className="text-sm font-black text-brand-600 italic truncate">{item.meaning}</p>
                               </div>
                           </div>

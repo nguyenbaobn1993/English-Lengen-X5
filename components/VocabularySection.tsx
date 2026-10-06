@@ -342,7 +342,7 @@ export const VocabularySection: React.FC<VocabularySectionProps> = ({ items = []
                       </h3>
                       <div className="flex flex-wrap items-center gap-1 mt-0.5">
                         <span className="text-brand-600 text-xs font-mono bg-brand-50 px-1.5 py-0.5 rounded font-semibold">
-                          /{item.ipa}/
+                          /{String(item.ipa || '').replace(/^\/+|\/+$/g, '')}/
                         </span>
                         <span className="text-[8px] sm:text-[9px] bg-brand-500 text-white px-1.5 py-0.5 rounded font-bold uppercase">
                           {item.type}
