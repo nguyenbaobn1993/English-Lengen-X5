@@ -311,24 +311,40 @@ export const buildDemoDatabase = async (): Promise<any> => {
     }
   });
 
-  // Mật khẩu quản trị của bản demo (chỉ tồn tại trong trình duyệt)
-  const salt = toHex(crypto.getRandomValues(new Uint8Array(16)).buffer);
+  // Mật khẩu của bản demo (chỉ tồn tại trong trình duyệt)
   const iterations = 120000;
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(DEMO_TEACHER_PASSWORD), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits(
-    { name: 'PBKDF2', hash: 'SHA-256', salt: new Uint8Array((salt.match(/.{2}/g) || []).map(h => parseInt(h, 16))), iterations },
-    key, 256
-  );
+  const secret = async (password: string) => {
+    const salt = toHex(crypto.getRandomValues(new Uint8Array(16)).buffer);
+    const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(password), 'PBKDF2', false, ['deriveBits']);
+    const bits = await crypto.subtle.deriveBits(
+      { name: 'PBKDF2', hash: 'SHA-256', salt: new Uint8Array((salt.match(/.{2}/g) || []).map(h => parseInt(h, 16))), iterations },
+      key, 256
+    );
+    return { salt, hash: toHex(bits), iterations };
+  };
+  const adminSecret = await secret(DEMO_TEACHER_PASSWORD);
+  const sampleTeacherSecret = await secret(DEMO_TEACHER_PASSWORD);
+  const createdTeacher = iso(addDays(today, -30));
 
   return {
     _ping: {
       teacher_auth: {
         username: DEMO_TEACHER_USERNAME,
         displayName: 'Giáo viên Demo',
-        salt,
-        hash: toHex(bits),
-        iterations,
+        ...adminSecret,
         updatedAt: iso(addDays(today, -1))
+      },
+      // Giáo viên mẫu do quản trị tạo (đăng nhập: mrsly / demo)
+      teacher_accounts: {
+        t_demo_mrsly: {
+          id: 't_demo_mrsly',
+          username: 'mrsly',
+          displayName: 'Mrs Lý',
+          ...sampleTeacherSecret,
+          disabled: false,
+          createdAt: createdTeacher,
+          updatedAt: createdTeacher
+        }
       }
     },
     classes: keyed(classes),

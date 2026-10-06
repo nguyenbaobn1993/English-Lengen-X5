@@ -289,6 +289,8 @@ export type UserRole = 'teacher' | 'student';
 
 export interface AuthUser {
   authStamp?: string; // giáo viên: phiên bản mật khẩu trên hệ thống lúc đăng nhập
+  teacherAccountId?: string; // có giá trị = giáo viên do quản trị tạo (không phải tài khoản quản trị)
+  phone?: string;
   id: string;
   username: string;
   role: UserRole;

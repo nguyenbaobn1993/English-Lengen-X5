@@ -56,7 +56,7 @@ export const DemoEntryCard = ({ dark = true }: { dark?: boolean }) => (
           </button>
         </div>
         <p className={`text-[10px] mt-2 ${dark ? 'text-brand-200' : 'text-slate-500'}`}>
-          Tài khoản demo: giáo viên <b>{DEMO_TEACHER_USERNAME}</b> / <b>{DEMO_TEACHER_PASSWORD}</b> · học sinh mật khẩu <b>123</b>
+          Tài khoản demo: quản trị <b>{DEMO_TEACHER_USERNAME}</b> / <b>{DEMO_TEACHER_PASSWORD}</b> · giáo viên <b>mrsly</b> / <b>{DEMO_TEACHER_PASSWORD}</b> · học sinh mật khẩu <b>123</b>
         </p>
       </div>
     </div>

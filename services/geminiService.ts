@@ -115,9 +115,11 @@ export const getSelectedModel = (): string => {
     const provider = getAiProvider();
     const saved = localStorage.getItem(`${MODEL_STORAGE}_${provider}`) || localStorage.getItem(MODEL_STORAGE);
     const available = getModelsForProvider(provider);
-    if (saved && available.some(m => m.id === saved)) {
+    const discovered = getCachedAvailableModels(provider);
+    if (saved && (available.some(m => m.id === saved) || discovered?.includes(saved))) {
       return saved;
     }
+    if (discovered && discovered.length) return discovered[0];
     const defaultModel = available.find(m => m.isDefault)?.id || available[0].id;
     return defaultModel;
   }
@@ -129,6 +131,92 @@ export const setSelectedModel = (modelId: string): void => {
     const provider = getAiProvider();
     localStorage.setItem(`${MODEL_STORAGE}_${provider}`, modelId);
     localStorage.setItem(MODEL_STORAGE, modelId);
+  }
+};
+
+// ===== TỰ DÒ MODEL KHẢ DỤNG THEO API KEY =====
+// Tên model Gemini thay đổi theo thời gian (model mới ra, model cũ ngừng). Thay vì đoán tên cố định,
+// app hỏi thẳng Google danh sách model mà key này gọi được, rồi chỉ dùng các model đó.
+const AVAILABLE_MODELS_CACHE = 'lx5_gemini_available_models';
+
+interface AvailableModelsCache { keyTail: string; ids: string[]; checkedAt: number }
+
+const keyTail = (key: string) => (key || '').trim().slice(-6);
+
+/** Model dùng được cho việc tạo nội dung chữ (bỏ model ảnh, giọng nói, embedding, live...) */
+const isTextGenerationModel = (id: string) =>
+  /^gemini-/.test(id) && !/(tts|image|embedding|live|audio|native|vision|aqa|robotics|computer-use|exp-\d)/.test(id);
+
+/** Điểm xếp hạng: phiên bản mới hơn trước, flash > flash-lite > pro (nhanh & có hạn mức miễn phí rộng hơn) */
+const modelRank = (id: string) => {
+  // Bí danh luôn trỏ tới bản ổn định mới nhất (vd gemini-flash-latest)
+  if (/^gemini-flash-latest$/.test(id)) return 26.9;
+  if (/^gemini-flash-lite-latest$/.test(id)) return 25.9;
+  if (/^gemini-pro-latest$/.test(id)) return 20;
+  const ver = parseFloat((id.match(/gemini-(\d+(?:\.\d+)?)/) || [])[1] || '0');
+  // pro thường không có / rất ít lượt miễn phí → xếp sau flash của bản trước
+  const tier = /flash-lite/.test(id) ? 1 : /flash/.test(id) ? 2 : /pro/.test(id) ? -6 : -9;
+  const stable = /preview|exp/.test(id) ? 0 : 0.05;
+  return ver * 10 + tier + stable;
+};
+
+export const rankAvailableModels = (ids: string[]) =>
+  [...new Set(ids.filter(isTextGenerationModel))].sort((a, b) => modelRank(b) - modelRank(a));
+
+export const getCachedAvailableModels = (provider: AiProvider = getAiProvider()): string[] | null => {
+  if (provider !== 'gemini' || typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(AVAILABLE_MODELS_CACHE);
+    if (!raw) return null;
+    const c = JSON.parse(raw) as AvailableModelsCache;
+    if (c.keyTail !== keyTail(getApiKeyForProvider('gemini'))) return null;
+    return Array.isArray(c.ids) && c.ids.length ? c.ids : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Hỏi Google danh sách model mà API key gọi được (Gemini API / AI Studio key) */
+export const fetchAvailableModels = async (apiKey: string): Promise<{ ok: boolean; ids: string[]; error?: string }> => {
+  const key = (apiKey || '').trim();
+  if (!key) return { ok: false, ids: [], error: 'Chưa nhập API key.' };
+  try {
+    const ids: string[] = [];
+    let pageToken = '';
+    for (let page = 0; page < 5; page++) {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000${pageToken ? `&pageToken=${pageToken}` : ''}`;
+      const res = await fetch(url, { headers: { 'x-goog-api-key': key } });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = data?.error?.message || `HTTP ${res.status}`;
+        return { ok: false, ids: [], error: parseApiError({ message: `${res.status} ${data?.error?.status || ''} ${msg}` }).message + ` (${msg})` };
+      }
+      (data.models || []).forEach((m: any) => {
+        const methods: string[] = m.supportedGenerationMethods || [];
+        if (methods.includes('generateContent')) ids.push(String(m.name || '').replace(/^models\//, ''));
+      });
+      if (!data.nextPageToken) break;
+      pageToken = data.nextPageToken;
+    }
+    const ranked = rankAvailableModels(ids);
+    try {
+      localStorage.setItem(AVAILABLE_MODELS_CACHE, JSON.stringify({ keyTail: keyTail(key), ids: ranked, checkedAt: Date.now() }));
+    } catch {}
+    return { ok: true, ids: ranked };
+  } catch (e: any) {
+    return { ok: false, ids: [], error: `Không kết nối được tới Google: ${e?.message || e}` };
+  }
+};
+
+/** Gọi thử 1 câu rất ngắn để chắc chắn key + model tạo được nội dung */
+export const testGenerateWithModel = async (apiKey: string, model: string): Promise<{ ok: boolean; error?: string }> => {
+  try {
+    const client = new GoogleGenAI({ apiKey: apiKey.trim() });
+    const r = await client.models.generateContent({ model, contents: 'Reply with exactly: OK' });
+    return { ok: !!(r.text || '').trim() };
+  } catch (e: any) {
+    const parsed = parseApiError(e);
+    return { ok: false, error: `${parsed.message} (${String(e?.message || e).slice(0, 160)})` };
   }
 };
 
@@ -179,7 +267,7 @@ export const parseApiError = (error: any): { type: ApiErrorType; message: string
     };
   }
 
-  if (lower.includes('401') || msg.includes('API_KEY_INVALID') || lower.includes('key invalid')) {
+  if (lower.includes('401') || msg.includes('API_KEY_INVALID') || lower.includes('key invalid') || lower.includes('api key not valid') || lower.includes('api key expired')) {
     return {
       type: 'API_KEY_INVALID',
       message: 'API Key không hợp lệ hoặc đã hết hạn. Vui lòng kiểm tra lại trong Cài đặt.'
@@ -256,8 +344,11 @@ export const callWithFallback = async <T>(
     ? ['gemini-2.5-flash', 'gemini-2.5-flash-lite']
     : ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash'];
 
-  // Deduplicate: user selected model first, followed by default chain
-  const orderedModels = Array.from(new Set([selectedModel, ...defaultChain]));
+  // Nếu đã dò được danh sách model mà key gọi được → chỉ dùng các model đó (model chọn trước, rồi theo xếp hạng)
+  const available = getCachedAvailableModels(provider);
+  const orderedModels = available
+    ? Array.from(new Set([...(available.includes(selectedModel) ? [selectedModel] : []), ...available])).slice(0, 6)
+    : Array.from(new Set([selectedModel, ...defaultChain]));
   const errorDetails: string[] = [];
 
   for (let i = 0; i < orderedModels.length; i++) {
@@ -268,8 +359,13 @@ export const callWithFallback = async <T>(
       const parsed = parseApiError(err);
       errorDetails.push(`[${currentModel}]: ${parsed.type} - ${parsed.message}`);
 
-      // Stop immediately on auth, quota or invalid argument errors
-      if (parsed.type === 'API_KEY_INVALID' || parsed.type === 'QUOTA_EXCEEDED' || parsed.type === 'INVALID_ARGUMENT') {
+      // Key sai → dừng ngay (đổi model cũng không giúp được)
+      if (parsed.type === 'API_KEY_INVALID') {
+        throw new Error(parsed.message);
+      }
+      // Hết hạn mức / tham số không hợp lệ: mỗi model có hạn mức & tính năng riêng → thử model kế tiếp,
+      // chỉ báo lỗi khi đã là model cuối cùng
+      if ((parsed.type === 'QUOTA_EXCEEDED' || parsed.type === 'INVALID_ARGUMENT') && i === orderedModels.length - 1) {
         throw new Error(parsed.message);
       }
 

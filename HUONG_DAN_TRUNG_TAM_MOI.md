@@ -39,3 +39,20 @@ rồi **Redeploy**. Biến môi trường được ưu tiên hơn file json. Khi
 - Gửi kết quả sang Google Sheets đang **tắt**. Muốn bật: dán URL Web App của trung tâm vào `services/googleSheetsService.ts` (xem `google-apps-script.js`).
 - Logo, ảnh bìa và ảnh thành viên nằm trong `public/brand/`. Slogan, danh sách đội ngũ sửa trong `components/Brand.tsx`.
 - Chạy thử trên máy với Firebase Emulator: đặt `VITE_FIREBASE_DATABASE_URL=http://localhost:9000` (chỉ chấp nhận `http://` với localhost).
+
+## 4. Bật tạo bài bằng AI (Gemini)
+1. Lấy key miễn phí tại https://aistudio.google.com/apikey (đăng nhập Google → **Create API key**).
+2. Đăng nhập app vai giáo viên → **⚙️ Cài đặt → 🤖 Dịch Vụ AI** → chọn **Gemini API** → dán key.
+3. Bấm **⚡ Kiểm tra key & tự tìm model dùng được**: app hỏi Google danh sách model của key, tạo thử 1 câu,
+   tự chọn model tốt nhất. Thấy ✅ thì bấm **LƯU CẤU HÌNH**.
+- Key lưu trên trình duyệt của từng máy (không lưu lên cơ sở dữ liệu để tránh lộ key) → mỗi máy giáo viên nhập 1 lần.
+- Khi một model hết lượt miễn phí, app tự chuyển sang model khác của cùng key.
+- Nếu giới hạn key trên Google Cloud, dùng **API restrictions → Generative Language API**.
+  **Không** dùng giới hạn theo website (HTTP referrer): app gửi yêu cầu không kèm referrer nên sẽ bị chặn.
+
+## 5. Thêm giáo viên
+- Tài khoản tạo bằng `npm run setup` là **quản trị** (chủ trung tâm).
+- Quản trị vào **⚙️ Cài đặt → 👥 Giáo Viên** → nhập tên hiển thị, tên đăng nhập, mật khẩu → **Tạo tài khoản giáo viên**.
+- Giáo viên đăng nhập ở mục **Giáo Viên** trên màn hình đăng nhập, dùng được mọi chức năng dạy học.
+- Chỉ quản trị mới thêm / khóa / xóa / đặt lại mật khẩu giáo viên, đổi mật khẩu quản trị và xác nhận xóa lớp.
+- Giáo viên tự đổi mật khẩu ở **⚙️ Cài đặt → 🔐 Tài Khoản Của Tôi**.

@@ -1,4 +1,5 @@
 import { AuthUser, UserRole } from '../types';
+import { verifyTeacherAccount, getTeacherAccount } from './teacherAccounts';
 import { INITIAL_ACCOUNTS, AccountCredential } from '../accounts/credentials';
 import { verifyTeacherPassword, setTeacherPasswordOnCloud, fetchTeacherAuth } from './teacherAuth';
 
@@ -48,7 +49,25 @@ export const loginTeacher = async (
   if (!usernameInput.trim()) return { success: false, error: 'Vui lòng nhập tên đăng nhập!' };
   if (!passwordInput.trim()) return { success: false, error: 'Vui lòng nhập mật khẩu!' };
   const res = await verifyTeacherPassword(passwordInput, usernameInput);
-  if (!res.ok || !res.record) return { success: false, error: res.error };
+  if (!res.ok || !res.record) {
+    // Không phải tài khoản quản trị → thử tài khoản giáo viên do quản trị tạo
+    const sub = await verifyTeacherAccount(usernameInput, passwordInput);
+    if (sub.ok && sub.account) {
+      const teacherUser: AuthUser = {
+        id: `teacher_${sub.account.id}`,
+        username: sub.account.username,
+        role: 'teacher',
+        name: sub.account.displayName || sub.account.username,
+        avatar: '🧑‍🏫',
+        authStamp: sub.account.updatedAt,
+        teacherAccountId: sub.account.id
+      };
+      setCurrentUser(teacherUser);
+      return { success: true, user: teacherUser };
+    }
+    // Chưa cài mật khẩu quản trị / mất kết nối → giữ nguyên thông báo gốc
+    return { success: false, error: sub.error || res.error };
+  }
   const authUser: AuthUser = {
     id: 'teacher_dung',
     username: res.record.username,
@@ -97,6 +116,12 @@ export const isTeacherSessionValid = async (): Promise<boolean> => {
   const user = getCurrentUser();
   if (!user || user.role !== 'teacher') return true;
   if (!user.authStamp) return false;
+  if (user.teacherAccountId) {
+    // Giáo viên do quản trị tạo: bị khóa / xóa / đặt lại mật khẩu → hết phiên
+    const acc = await getTeacherAccount(user.teacherAccountId);
+    if (acc === 'error') return true;
+    return !!acc && !acc.disabled && acc.updatedAt === user.authStamp;
+  }
   const record = await fetchTeacherAuth();
   if (record === 'error') return true;
   if (!record) return false;

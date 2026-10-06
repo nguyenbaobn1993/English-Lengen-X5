@@ -8,8 +8,13 @@ import {
   getSelectedModel,
   setSelectedModel,
   getModelsForProvider,
-  isValidGoogleAiApiKey
+  isValidGoogleAiApiKey,
+  fetchAvailableModels,
+  testGenerateWithModel,
+  getCachedAvailableModels
 } from '../services/geminiService';
+import { getCurrentUser } from '../services/authService';
+import { TeacherAccountsPanel, MyTeacherPasswordPanel } from './teacher/TeacherAccountsPanel';
 import { getFirebaseConfig, saveFirebaseConfig, clearFirebaseConfig, testFirebaseConnection } from '../services/firebaseService';
 import {
   getTeacherCredentials,
@@ -32,7 +37,13 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
   const [selectedModel, setModel] = useState('');
 
   // Mode tabs: AI, Firebase, and Teacher Account
-  const [activeTab, setActiveTab] = useState<'ai' | 'firebase' | 'account'>('ai');
+  const [activeTab, setActiveTab] = useState<'ai' | 'firebase' | 'account' | 'teachers'>('ai');
+  // Kiểm tra key & dò model khả dụng
+  const [checkingKey, setCheckingKey] = useState(false);
+  const [keyCheck, setKeyCheck] = useState<{ ok: boolean; text: string } | null>(null);
+  const [discoveredModels, setDiscoveredModels] = useState<string[] | null>(null);
+  const currentUser = getCurrentUser();
+  const isSubTeacher = !!currentUser?.teacherAccountId;
 
   // Firebase state
   const [fbDatabaseUrl, setFbDatabaseUrl] = useState('');
@@ -57,6 +68,8 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
       setGeminiKey(getApiKeyForProvider('gemini'));
       setAgentPlatformKey(getApiKeyForProvider('agent-platform'));
       setModel(getSelectedModel());
+      setDiscoveredModels(getCachedAvailableModels('gemini'));
+      setKeyCheck(null);
 
       const fb = getFirebaseConfig();
       if (fb) {
@@ -79,7 +92,55 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
 
   if (!isOpen) return null;
 
-  const currentModels = getModelsForProvider(provider);
+  const baseModels = getModelsForProvider(provider);
+  // Gộp model dò được từ Google (chưa có trong danh sách sẵn) vào cuối danh sách
+  const currentModels = provider === 'gemini' && discoveredModels
+    ? [
+        ...baseModels,
+        ...discoveredModels.filter(id => !baseModels.some(m => m.id === id)).map(id => ({
+          id, name: id, description: 'Model key của bạn đang dùng được (tự dò từ Google)', provider: 'gemini' as AiProvider, isDefault: false
+        }))
+      ]
+    : baseModels;
+  const isModelAvailable = (id: string): boolean | null =>
+    provider !== 'gemini' || !discoveredModels ? null : discoveredModels.includes(id);
+
+  const handleCheckKey = async () => {
+    const key = geminiKey.trim();
+    setCheckingKey(true);
+    setKeyCheck({ ok: true, text: '⏳ Đang hỏi Google danh sách model của key này...' });
+    const list = await fetchAvailableModels(key);
+    if (!list.ok) {
+      setCheckingKey(false);
+      setDiscoveredModels(null);
+      setKeyCheck({ ok: false, text: `❌ ${list.error}` });
+      return;
+    }
+    setDiscoveredModels(list.ids);
+    const best = list.ids.includes(selectedModel) ? selectedModel : list.ids[0];
+    if (!best) {
+      setCheckingKey(false);
+      setKeyCheck({ ok: false, text: '❌ Key hợp lệ nhưng không có model Gemini nào tạo được nội dung.' });
+      return;
+    }
+    setModel(best);
+    setKeyCheck({ ok: true, text: `⏳ Key hợp lệ (${list.ids.length} model). Đang tạo thử với ${best}...` });
+    // Thử lần lượt tối đa 3 model tốt nhất cho tới khi tạo được nội dung
+    const candidates = [best, ...list.ids.filter(id => id !== best)].slice(0, 3);
+    let lastErr = '';
+    for (const m of candidates) {
+      const t = await testGenerateWithModel(key, m);
+      if (t.ok) {
+        setModel(m);
+        setCheckingKey(false);
+        setKeyCheck({ ok: true, text: `✅ Tạo thử thành công với ${m}. Bấm "LƯU CẤU HÌNH" để dùng.` });
+        return;
+      }
+      lastErr = t.error || '';
+    }
+    setCheckingKey(false);
+    setKeyCheck({ ok: false, text: `⚠️ Key hợp lệ nhưng tạo thử chưa được: ${lastErr}` });
+  };
   const currentKey = provider === 'agent-platform' ? agentPlatformKey : geminiKey;
   const isKeyValidFormat = isValidGoogleAiApiKey(currentKey);
 
@@ -203,8 +264,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
               activeTab === 'account' ? 'bg-white text-indigo-700 shadow-md' : 'text-slate-500 hover:text-slate-800'
             }`}
           >
-            <span>🔐</span> Tài Khoản Giáo Viên
+            <span>🔐</span> {isSubTeacher ? 'Tài Khoản Của Tôi' : 'Tài Khoản Quản Trị'}
           </button>
+          {!isSubTeacher && (
+            <button
+              onClick={() => setActiveTab('teachers')}
+              className={`flex-1 min-w-[130px] py-2.5 rounded-xl font-bold text-xs sm:text-sm flex items-center justify-center gap-1.5 transition-all ${
+                activeTab === 'teachers' ? 'bg-white text-brand-700 shadow-md' : 'text-slate-500 hover:text-slate-800'
+              }`}
+            >
+              <span>👥</span> Giáo Viên
+            </button>
+          )}
         </div>
 
         {/* Tab 1: AI Provider Settings */}
@@ -305,6 +376,27 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
               </div>
             </div>
 
+            {/* Kiểm tra key & dò model */}
+            {provider === 'gemini' && (
+              <div className="p-3 rounded-2xl border-2 border-dashed border-brand-200 bg-brand-50/40 space-y-2">
+                <button
+                  type="button"
+                  disabled={checkingKey || !geminiKey.trim()}
+                  onClick={handleCheckKey}
+                  className="w-full py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 disabled:opacity-50 text-white font-black text-sm"
+                >
+                  {checkingKey ? '⏳ Đang kiểm tra...' : '⚡ Kiểm tra key & tự tìm model dùng được'}
+                </button>
+                {keyCheck && (
+                  <p className={`text-xs font-bold ${keyCheck.ok ? 'text-emerald-700' : 'text-rose-600'}`}>{keyCheck.text}</p>
+                )}
+                <p className="text-[11px] text-slate-500 leading-relaxed">
+                  App hỏi Google xem key này gọi được model nào, chỉ dùng các model đó và tự chuyển sang model khác khi một model hết lượt miễn phí.
+                  Key lưu riêng trên trình duyệt này — mỗi máy giáo viên cần nhập một lần.
+                </p>
+              </div>
+            )}
+
             {/* Model Selection */}
             <div>
               <label className="block text-xs font-black uppercase tracking-wider text-slate-500 mb-2">
@@ -324,8 +416,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
                           : 'border-slate-200 hover:border-slate-300 bg-white text-slate-700'
                       }`}
                     >
-                      <div className="flex items-center justify-between">
+                      <div className="flex items-center justify-between gap-2">
                         <span className="font-bold text-sm">{m.name}</span>
+                        {isModelAvailable(m.id) === true && (
+                          <span className="ml-auto px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-bold">✓ Key dùng được</span>
+                        )}
+                        {isModelAvailable(m.id) === false && (
+                          <span className="ml-auto px-2 py-0.5 rounded-full bg-slate-100 text-slate-400 text-[10px] font-bold">Key không có model này</span>
+                        )}
                         {m.isDefault && (
                           <span className="px-2 py-0.5 rounded-full bg-brand-500 text-white text-[10px] font-bold">
                             Mặc định
@@ -448,14 +546,26 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
         )}
 
         {/* Tab 3: Teacher Account Credentials & Persistence */}
-        {activeTab === 'account' && (
+        {activeTab === 'account' && isSubTeacher && (
+          <div className="overflow-y-auto space-y-4 flex-1 pr-1">
+            <MyTeacherPasswordPanel />
+          </div>
+        )}
+
+        {activeTab === 'teachers' && !isSubTeacher && (
+          <div className="overflow-y-auto space-y-4 flex-1 pr-1">
+            <TeacherAccountsPanel />
+          </div>
+        )}
+
+        {activeTab === 'account' && !isSubTeacher && (
           <div className="overflow-y-auto space-y-4 flex-1 pr-1">
             <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-2xl">
               <h4 className="font-black text-indigo-900 text-sm mb-1 flex items-center gap-2">
                 <span>🔐</span> Quản Lý Tài Khoản & Mật Khẩu Giáo Viên
               </h4>
               <p className="text-xs text-indigo-700 leading-relaxed">
-                Cô có thể thay đổi tên đăng nhập và mật khẩu theo ý muốn. Thông tin này sẽ được lưu trên thiết bị của cô để lần sau tự động điền sẵn mà không phải nhập lại.
+                Đây là tài khoản QUẢN TRỊ (chủ trung tâm). Muốn thêm giáo viên khác, dùng tab "👥 Giáo Viên". Thông tin này sẽ được lưu trên thiết bị của cô để lần sau tự động điền sẵn mà không phải nhập lại.
               </p>
             </div>
 
@@ -559,7 +669,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
         )}
 
         {/* Footer Button */}
-        <div className="pt-3 border-t border-slate-100 shrink-0">
+        <div className={`pt-3 border-t border-slate-100 shrink-0 ${activeTab === 'teachers' || (activeTab === 'account' && isSubTeacher) ? 'hidden' : ''}`}>
           <button
             onClick={handleSave}
             className={`w-full py-3.5 text-white font-black text-base rounded-2xl shadow-xl transition-all flex items-center justify-center gap-2 ${
