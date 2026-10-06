@@ -1,0 +1,84 @@
+{
+    "arrange_words_example": {
+        "id": "arrange_1",
+        "type": "arrange_words",
+        "level": "A1",
+        "display_tokens": [
+            "She",
+            "goes",
+            "to",
+            "school",
+            "every",
+            "day",
+            "."
+        ],
+        "correct_tokens": [
+            "She",
+            "goes",
+            "to",
+            "school",
+            "every",
+            "day",
+            "."
+        ],
+        "word_bank_tokens": [
+            "to",
+            "She",
+            ".",
+            "day",
+            "every",
+            "school",
+            "goes"
+        ],
+        "correct_answer_string": "She goes to school every day.",
+        "explanation_vi": "Cấu trúc: Chủ ngữ + động từ + nơi chốn + thời gian. 'She' là ngôi 3 số ít nên động từ thêm 's' (goes).",
+        "translation": "Cô ấy đi học mỗi ngày."
+    },
+    "fill_blanks_example": {
+        "id": "fill_1",
+        "type": "fill_blanks",
+        "level": "A1",
+        "sentence_template": "He ___ a student.",
+        "blanks": [
+            1
+        ],
+        "display_tokens": [
+            "He",
+            "___",
+            "a",
+            "student",
+            "."
+        ],
+        "correct_tokens": [
+            "is"
+        ],
+        "word_bank_tokens": [
+            "is",
+            "am",
+            "are",
+            "be"
+        ],
+        "correct_answer_string": "He is a student.",
+        "explanation_vi": "'He' là ngôi 3 số ít, dùng động từ 'is'. 'am' dùng với 'I', 'are' dùng với 'you/we/they'.",
+        "clueEmoji": "👨‍🎓"
+    },
+    "validation_rules": {
+        "token_integrity": "Every token in correct_tokens must exist in word_bank_tokens with matching count",
+        "answer_match": "joinTokensWithSpacing(correct_tokens) must equal correct_answer_string",
+        "grammatical_correctness": "correct_answer_string must be grammatically correct English",
+        "no_ambiguity": "Only one correct answer possible unless accepted_variants specified"
+    },
+    "spacing_rules": {
+        "no_space_before": [
+            ".",
+            ",",
+            "?",
+            "!",
+            ":",
+            ";",
+            "'"
+        ],
+        "example_correct": "Hello, world!",
+        "example_wrong": "Hello , world !"
+    }
+}

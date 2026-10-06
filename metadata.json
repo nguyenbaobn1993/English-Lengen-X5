@@ -1,0 +1,8 @@
+{
+  "name": "ENGLISH LEGEND X5",
+  "description": "LEGEND X5 - CONNECT THE WORLD. Hệ thống AI hỗ trợ giảng dạy và học tập Tiếng Anh dành cho trẻ em.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

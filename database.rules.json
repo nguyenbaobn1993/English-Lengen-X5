@@ -1,0 +1,139 @@
+{
+  "rules": {
+    /* 
+      QUY TẮC BẢO MẬT FIREBASE REALTIME DATABASE - ENGLISH LEGEND X5
+      - Chặn hoàn toàn quyền đọc/xóa toàn bộ cơ sở dữ liệu ở cấp Root (chống lệnh phá hoại DELETE /.json).
+      - Chặn xóa nguyên bảng (chống xóa trắng bảng học sinh / bài tập).
+      - Cấp quyền đọc và ghi từng mục theo ID cụ thể (khớp chuẩn với kiến trúc REST PATCH của ứng dụng).
+      - Kiểm tra cấu trúc dữ liệu (validate) ngăn chặn ghi đè dữ liệu rác, đảm bảo tính toàn vẹn.
+      - Duy trì 100% hoạt động mượt mà cho học sinh nộp bài và giáo viên đồng bộ dữ liệu.
+    */
+    ".read": false,
+    ".write": false,
+
+    /* 1. BẢNG LỚP HỌC */
+    "classes": {
+      ".read": true,
+      "$classId": {
+        ".write": true,
+        ".validate": "newData.val() == null || (newData.hasChildren(['id', 'name']) && newData.child('id').isString())"
+      }
+    },
+    "deleted_classes": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 2. BẢNG HỌC SINH */
+    "students": {
+      ".read": true,
+      "$studentId": {
+        ".write": true,
+        ".validate": "newData.val() == null || (newData.hasChildren(['id', 'name', 'classId']) && newData.child('id').isString())"
+      }
+    },
+    "deleted_students": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 3. BẢNG BÀI TẬP VÀ ĐỀ THI */
+    "assignments": {
+      ".read": true,
+      "$assignmentId": {
+        ".write": true,
+        ".validate": "newData.val() == null || (newData.hasChildren(['id', 'title']) && newData.child('id').isString())"
+      }
+    },
+    "deleted_assignments": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 4. BẢNG BÀI NỘP CỦA HỌC SINH */
+    "submissions": {
+      ".read": true,
+      "$submissionId": {
+        ".write": true,
+        ".validate": "newData.val() == null || (newData.hasChildren(['id', 'studentName', 'assignmentId']) && newData.child('id').isString())"
+      }
+    },
+    "deleted_submissions": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 5. BẢNG THÔNG BÁO BÀI NỘP */
+    "admin_notifications": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 6. BÁO CÁO & SỔ ĐIỂM */
+    "monthly_reports": {
+      ".read": true,
+      "$reportId": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+    "weekly_reports": {
+      ".read": true,
+      "$reportId": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+    "annual_reports": {
+      ".read": true,
+      "$reportId": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 7. LỊCH HỌC & ĐIỂM DANH */
+    "class_schedules": {
+      ".read": true,
+      "$scheduleId": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+    "attendance_records": {
+      ".read": true,
+      "$attendanceId": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+    "deleted_items": {
+      ".read": true,
+      "$id": {
+        ".write": true,
+        ".validate": "newData.val() == null || newData.hasChildren(['id'])"
+      }
+    },
+
+    /* 8. KIỂM TRA KẾT NỐI */
+    "_ping": {
+      ".read": true,
+      ".write": true
+    }
+  }
+}
