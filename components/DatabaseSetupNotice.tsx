@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { LegendLogo, royalBg, BRAND_SLOGAN } from './Brand';
+import { DemoEntryCard } from './DemoMode';
 import { saveFirebaseConfig, testFirebaseConnection, DEFAULT_FIREBASE_CONFIG } from '../services/firebaseService';
 
 /**
@@ -39,6 +40,8 @@ export const DatabaseSetupNotice: React.FC = () => {
             trước khi giáo viên và học sinh sử dụng.
           </p>
         </div>
+
+        <DemoEntryCard dark={false} />
 
         <div className="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-900 space-y-2">
           <p className="font-black">Cách gắn cho MỌI máy (bắt buộc khi đưa lên web):</p>

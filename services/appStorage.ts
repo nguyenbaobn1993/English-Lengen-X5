@@ -18,7 +18,10 @@
  * 4. Bảo vệ toàn cục: Bọc Storage.prototype.setItem để QuotaExceededError không bao giờ làm gián đoạn ứng dụng.
  */
 
-const DB_NAME = 'mrs_dung_offline_store';
+import { getDemoIdbName } from './demoBoot';
+
+// Bản demo dùng kho IndexedDB riêng, không đụng dữ liệu thật trên máy
+const DB_NAME = getDemoIdbName() || 'mrs_dung_offline_store';
 const STORE_NAME = 'kv_store';
 const DB_VERSION = 1;
 

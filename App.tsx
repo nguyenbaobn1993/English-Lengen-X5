@@ -16,6 +16,8 @@ import { AdminNotificationBell } from './components/teacher/AdminNotificationBel
 import { UpdateBanner, StorageWarning } from './components/UpdateBanner';
 import { startAutoUpdate } from './services/appUpdate';
 import { LegendLogo, GoldText, BrandFooter, royalBg, BRAND_SLOGAN } from './components/Brand';
+import { DemoBanner } from './components/DemoMode';
+import { isDemoMode } from './services/demoBoot';
 
 function App() {
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(() => getCurrentUser());
@@ -48,7 +50,7 @@ function App() {
   useEffect(() => {
     const valid = hasApiKey();
     setHasKey(valid);
-    if (!valid && currentRole === 'teacher' && currentUser) {
+    if (!valid && currentRole === 'teacher' && currentUser && !isDemoMode()) {
       // Prompt settings on launch for teacher if no key configured
       setShowSettings(true);
     }
@@ -106,6 +108,7 @@ function App() {
   if (!currentUser) {
     return (
       <>
+        <DemoBanner />
         <LoginScreen onLoginSuccess={handleLoginSuccess} />
         <UpdateBanner />
         <StorageWarning />
@@ -115,8 +118,9 @@ function App() {
 
   return (
     <div className="min-h-screen bg-brand-50 flex flex-col font-serif text-slate-900">
+      <DemoBanner />
       {/* Header */}
-      <header className="border-b-4 border-highlight-400/70 sticky top-0 z-50 shadow-xl font-sans" style={royalBg}>
+      <header className={`border-b-4 border-highlight-400/70 sticky ${isDemoMode() ? 'top-8 sm:top-7' : 'top-0'} z-50 shadow-xl font-sans`} style={royalBg}>
         <div className="max-w-[1600px] mx-auto px-3 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-2">
           {/* Logo & Brand */}
           <div className="flex items-center gap-2 sm:gap-4">

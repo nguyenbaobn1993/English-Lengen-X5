@@ -1,3 +1,5 @@
+// Chế độ demo phải chạy TRƯỚC mọi module khác (chuyển hướng lưu trữ + Firebase giả)
+import { prepareDemo } from './services/demoBoot';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
@@ -13,7 +15,7 @@ if (!rootElement) {
 const root = ReactDOM.createRoot(rootElement);
 
 // Khởi tạo và nạp dữ liệu IndexedDB vào bộ nhớ trước khi mount ứng dụng
-initAppStorage().finally(() => {
+prepareDemo().catch(() => {}).then(() => initAppStorage()).finally(() => {
   root.render(
     <React.StrictMode>
       <ErrorBoundary>

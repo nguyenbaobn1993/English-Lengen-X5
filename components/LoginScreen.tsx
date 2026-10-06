@@ -15,6 +15,8 @@ import {
 import { getClasses, getStudents, subscribeToSync } from '../services/assignmentService';
 import { StudentLeaderboardHonor } from './student/StudentLeaderboardHonor';
 import { HeroCarousel, TeamShowcase, GoldText, LegendLogo, royalBg, BRAND_SLOGAN } from './Brand';
+import { DemoEntryCard } from './DemoMode';
+import { isDemoMode } from '../services/demoBoot';
 import { VisitCounter } from './VisitCounter';
 import { StudentChangePasswordModal } from './student/StudentChangePasswordModal';
 
@@ -656,6 +658,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
       {/* Right Column: Leaderboard of Hardworking Top Students (col-span-12 lg:col-span-7) */}
       <div className="w-full lg:col-span-7 space-y-4 animate-fade-in">
+        {!isDemoMode() && <DemoEntryCard />}
         <StudentLeaderboardHonor
           initialClassId={studentClassName || 'ALL'}
           title="BẢNG DANH SÁCH THÀNH TÍCH HỌC SINH CHĂM CHỈ ĐANG DẪN ĐẦU ĐIỂM CAO NHẤT"

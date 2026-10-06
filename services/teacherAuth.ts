@@ -4,6 +4,7 @@
  * - Thao tác xóa nguy hiểm (xóa lớp, xóa nhiều học sinh / bài liên tiếp) phải nhập lại mật khẩu.
  */
 import { getFirebaseConfig } from './firebaseService';
+import { isDemoMode } from './demoBoot';
 
 export interface TeacherAuthRecord {
   username: string;
@@ -121,6 +122,8 @@ const askPassword = async (message: string): Promise<boolean> => {
  * - kind 'student' / 'assignment': từ lần xóa thứ 3 trong 5 phút trở đi phải nhập mật khẩu (chống xóa hàng loạt).
  */
 export const guardDestructiveAction = async (kind: 'class' | 'student' | 'assignment', label: string): Promise<boolean> => {
+  // Bản demo: dữ liệu mẫu trên trình duyệt, không cần hỏi lại mật khẩu
+  if (isDemoMode()) return true;
   const now = Date.now();
   const log = readLog();
   const recent = (log[kind] || []).filter(t => now - t < BURST_WINDOW_MS);

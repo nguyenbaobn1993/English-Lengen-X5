@@ -1384,7 +1384,7 @@ export const deleteStudent = (id: string, reason = 'Học sinh nghỉ học / ch
   notifySync('student_deleted', { id: stdId, name: stdName, timestamp: Date.now() });
 };
 
-const DEFAULT_SAMPLE_LESSON: LessonPlan = {
+export const DEFAULT_SAMPLE_LESSON: LessonPlan = {
   topic: "Unit 1: My New School",
   vocabulary: [
     { word: "school bag", emoji: "🎒", ipa: "/ˈskuːl bæɡ/", meaning: "cặp sách", example: "I have a new school bag.", sentenceMeaning: "tôi có một chiếc cặp sách mới.", type: "noun" },
