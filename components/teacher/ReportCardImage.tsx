@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { toBlob } from 'html-to-image';
+import { toBlob, getFontEmbedCSS } from 'html-to-image';
 import { SKILL_LABELS, SkillKey, StudentReport } from '../../services/progressReport';
 
 /**
@@ -183,6 +183,9 @@ export const ReportCard = ({ report }: { report: StudentReport }) => {
   );
 };
 
+// Font nhúng vào ảnh: chỉ tải & tính một lần rồi dùng lại (xuất cả lớp nhanh hơn nhiều)
+let fontCssCache: Promise<string> | null = null;
+
 /** Dựng phiếu ngoài màn hình → ảnh PNG */
 export const renderReportPng = async (report: StudentReport): Promise<Blob> => {
   const host = document.createElement('div');
@@ -197,7 +200,9 @@ export const renderReportPng = async (report: StudentReport): Promise<Blob> => {
     await Promise.all(imgs.map(img => (img.complete ? Promise.resolve() : new Promise(res => { img.onload = img.onerror = () => res(null); }))));
     try { await (document as any).fonts?.ready; } catch {}
     const node = host.firstElementChild as HTMLElement;
-    const blob = await toBlob(node, { pixelRatio: 2, backgroundColor: '#ffffff', width: W, cacheBust: true });
+    if (!fontCssCache) fontCssCache = getFontEmbedCSS(node).catch(() => '');
+    const fontEmbedCSS = await fontCssCache;
+    const blob = await toBlob(node, { pixelRatio: 2, backgroundColor: '#ffffff', width: W, fontEmbedCSS });
     if (!blob) throw new Error('Không tạo được ảnh');
     return blob;
   } finally {
@@ -216,7 +221,7 @@ export const downloadBlob = (blob: Blob, name: string) => {
   const a = document.createElement('a');
   a.href = url; a.download = name;
   document.body.appendChild(a); a.click(); a.remove();
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 };
 
 /** Sao chép ảnh vào bộ nhớ tạm (dán thẳng vào Zalo). Dùng ClipboardItem với Promise để giữ quyền thao tác người dùng. */
