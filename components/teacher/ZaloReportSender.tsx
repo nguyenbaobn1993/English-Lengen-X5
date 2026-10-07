@@ -4,6 +4,7 @@ import {
   ReportPeriod, SkillKey, SKILL_LABELS, StudentReport, buildStudentReport, formatReportMessage,
   monthPeriod, rankOf, zaloPhone
 } from '../../services/progressReport';
+import { renderReportPng, reportFileName, downloadBlob, copyReportImage } from './ReportCardImage';
 
 /**
  * GỬI NHẬN XÉT KẾT QUẢ HỌC TẬP QUA ZALO (miễn phí, bán tự động)
@@ -67,6 +68,7 @@ export const ZaloReportSender = () => {
   const [editing, setEditing] = useState<StudentReport | null>(null);
   const [wizardIdx, setWizardIdx] = useState<number | null>(null);
   const [toast, setToast] = useState('');
+  const [busy, setBusy] = useState('');
 
   useEffect(() => subscribeToSync(() => { setClasses(getClasses()); setTick(t => t + 1); }), []);
   useEffect(() => { if (!classId && classes[0]) setClassId(classes[0].id); }, [classes, classId]);
@@ -123,6 +125,45 @@ export const ZaloReportSender = () => {
     setDrafts(next); writeJson(DRAFT_KEY, next);
   };
 
+  /** Tải phiếu báo cáo dạng ảnh PNG */
+  const exportImage = async (r: StudentReport) => {
+    if (busy) return;
+    setBusy(r.student.id);
+    try {
+      downloadBlob(await renderReportPng(r), reportFileName(r));
+      showToast(`🖼 Đã tải ảnh phiếu báo cáo của ${r.student.name}.`);
+    } catch (e: any) {
+      showToast(`⚠️ Không xuất được ảnh: ${e?.message || e}`);
+    } finally { setBusy(''); }
+  };
+
+  const exportAllImages = async () => {
+    if (busy || !reports.length) return;
+    setBusy('ALL');
+    let ok = 0;
+    for (const r of reports) {
+      showToast(`🖼 Đang xuất ảnh ${ok + 1}/${reports.length}: ${r.student.name}...`);
+      try { downloadBlob(await renderReportPng(r), reportFileName(r)); ok++; } catch {}
+      await new Promise(res => setTimeout(res, 400));
+    }
+    setBusy('');
+    showToast(`🖼 Đã xuất ${ok}/${reports.length} ảnh phiếu báo cáo (trình duyệt có thể hỏi cho phép tải nhiều tệp).`);
+  };
+
+  /** Sao chép ẢNH phiếu báo cáo + mở Zalo → dán ảnh vào khung chat */
+  const sendImage = async (r: StudentReport) => {
+    const phone = zaloPhone(r.student.phone);
+    if (!phone) { showToast(`⚠️ ${r.student.name} chưa có số điện thoại hợp lệ.`); return; }
+    setBusy(r.student.id);
+    const ok = await copyReportImage(r);
+    setBusy('');
+    window.open(`https://zalo.me/${phone}`, '_blank', 'noopener');
+    markSent(r.student.id, true);
+    showToast(ok
+      ? `🖼 Đã sao chép ẢNH phiếu báo cáo của ${r.student.name}. Trong Zalo bấm Ctrl+V rồi Gửi.`
+      : '⚠️ Trình duyệt chưa cho sao chép ảnh — dùng nút "🖼 Xuất ảnh" rồi gửi tệp ảnh vào Zalo.');
+  };
+
   const copyAll = async () => {
     const text = reports.map(r => formatReportMessage(r)).join('\n\n────────────────────\n\n');
     const ok = await copyText(text);
@@ -141,7 +182,7 @@ export const ZaloReportSender = () => {
         </div>
         <p className="text-sm text-slate-500">
           App tự soạn nhận xét từng học sinh theo mẫu của trung tâm (điểm 5 kỹ năng, chuyên cần, hoàn thành bài tập, định hướng).
-          Bấm <b>📨 Gửi Zalo</b>: nội dung được sao chép và mở khung chat Zalo của số phụ huynh đã đăng ký — cô chỉ cần <b>dán (Ctrl+V)</b> rồi <b>Gửi</b>.
+          Bấm <b>📨 Gửi Zalo</b> (dạng chữ) hoặc <b>🖼 Gửi ảnh</b> (phiếu báo cáo dạng ảnh): nội dung được sao chép và mở khung chat Zalo của số phụ huynh — cô chỉ cần <b>dán (Ctrl+V)</b> rồi <b>Gửi</b>. Nút <b>🖼 Xuất ảnh</b> tải phiếu về máy.
         </p>
         <div className="text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-xl p-2.5">
           ℹ️ Miễn phí, dùng Zalo cá nhân của cô. Zalo không cho gửi tin hoàn toàn tự động tới số điện thoại; muốn tự động 100% cần
@@ -210,6 +251,9 @@ export const ZaloReportSender = () => {
             <button type="button" onClick={copyAll} disabled={!reports.length} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-sm disabled:opacity-50">
               📋 Sao chép tất cả
             </button>
+            <button type="button" onClick={exportAllImages} disabled={!reports.length || !!busy} className="px-4 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 font-bold text-sm disabled:opacity-50">
+              {busy === 'ALL' ? '⏳ Đang xuất ảnh...' : '🖼 Xuất ảnh cả lớp'}
+            </button>
             <button
               type="button"
               onClick={() => setWizardIdx(0)}
@@ -253,7 +297,9 @@ export const ZaloReportSender = () => {
               </div>
               <div className="flex flex-wrap items-center gap-2 mt-3">
                 <button type="button" onClick={() => setEditing(r)} className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">👁 Xem & sửa</button>
+                <button type="button" onClick={() => exportImage(r)} disabled={!!busy} className="px-3 py-2 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 font-bold text-xs disabled:opacity-50">{busy === r.student.id ? '⏳' : '🖼 Xuất ảnh'}</button>
                 <button type="button" onClick={() => sendOne(r)} disabled={!phone} className="px-3 py-2 rounded-xl bg-[#0068ff] hover:bg-[#0055d4] text-white font-black text-xs disabled:opacity-40">📨 Gửi Zalo</button>
+                <button type="button" onClick={() => sendImage(r)} disabled={!phone || !!busy} title="Sao chép ảnh phiếu báo cáo rồi mở Zalo" className="px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-[#0055d4] font-black text-xs disabled:opacity-40">🖼 Gửi ảnh</button>
                 {sentAt ? (
                   <button type="button" onClick={() => markSent(r.student.id, false)} className="ml-auto text-[11px] font-bold text-emerald-700 hover:underline" title="Bấm để đánh dấu lại là chưa gửi">
                     ✅ Đã gửi {new Date(sentAt).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' })}
@@ -276,6 +322,8 @@ export const ZaloReportSender = () => {
           onSave={d => { saveDraft(editing.student.id, d); setEditing(null); showToast(`💾 Đã lưu nhận xét của ${editing.student.name}.`); }}
           onReset={() => { resetDraft(editing.student.id); setEditing(null); showToast('↺ Đã khôi phục nhận xét tự động.'); }}
           onCopy={async text => showToast((await copyText(text)) ? '📋 Đã sao chép nội dung.' : '⚠️ Không sao chép được.')}
+          onExportImage={async rep => { try { downloadBlob(await renderReportPng(rep), reportFileName(rep)); showToast('🖼 Đã tải ảnh phiếu báo cáo.'); } catch (e: any) { showToast(`⚠️ Không xuất được ảnh: ${e?.message || e}`); } }}
+          onCopyImage={async rep => showToast((await copyReportImage(rep)) ? '🖼 Đã sao chép ảnh — dán (Ctrl+V) vào Zalo.' : '⚠️ Trình duyệt chưa cho sao chép ảnh, hãy dùng Xuất ảnh.')}
         />
       )}
 
@@ -296,7 +344,8 @@ export const ZaloReportSender = () => {
                 </div>
                 <div className="p-4 border-t border-slate-100 flex flex-wrap gap-2 justify-end">
                   <button type="button" onClick={() => setWizardIdx(i => (i === null ? null : i + 1))} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-sm">⏭ Bỏ qua</button>
-                  <button type="button" onClick={() => sendOne(wizardReport)} className="px-4 py-2.5 rounded-xl bg-[#0068ff] hover:bg-[#0055d4] text-white font-black text-sm">📨 Sao chép & mở Zalo</button>
+                  <button type="button" onClick={() => sendImage(wizardReport)} disabled={!!busy} className="px-4 py-2.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-[#0055d4] font-black text-sm disabled:opacity-50">🖼 Ảnh & mở Zalo</button>
+                  <button type="button" onClick={() => sendOne(wizardReport)} className="px-4 py-2.5 rounded-xl bg-[#0068ff] hover:bg-[#0055d4] text-white font-black text-sm">📨 Chữ & mở Zalo</button>
                   <button type="button" onClick={() => { markSent(wizardReport.student.id, true); /* hàng đợi tự rút ngắn → giữ nguyên chỉ số */ }} className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-sm">✓ Em tiếp theo</button>
                 </div>
               </>
@@ -318,13 +367,15 @@ export const ZaloReportSender = () => {
   );
 };
 
-const EditReportModal = ({ report, draft, onClose, onSave, onReset, onCopy }: {
+const EditReportModal = ({ report, draft, onClose, onSave, onReset, onCopy, onExportImage, onCopyImage }: {
   report: StudentReport;
   draft?: Draft;
   onClose: () => void;
   onSave: (d: Draft) => void;
   onReset: () => void;
   onCopy: (text: string) => void;
+  onExportImage: (r: StudentReport) => void;
+  onCopyImage: (r: StudentReport) => void;
 }) => {
   const [comment, setComment] = useState(report.comment);
   const [focus1, setFocus1] = useState(report.focus[0] || '');
@@ -337,7 +388,8 @@ const EditReportModal = ({ report, draft, onClose, onSave, onReset, onCopy }: {
     focus: [focus1, focus2].map(s => s.trim()).filter(Boolean),
     skills: Object.fromEntries(EDITABLE_SKILLS.map(k => [k, skills[k].trim() === '' ? null : Number(skills[k].replace(',', '.'))]))
   });
-  const preview = formatReportMessage(applyDraft(report, toDraft()));
+  const previewReport = applyDraft(report, toDraft());
+  const preview = formatReportMessage(previewReport);
 
   return (
     <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-3">
@@ -376,7 +428,9 @@ const EditReportModal = ({ report, draft, onClose, onSave, onReset, onCopy }: {
         </div>
         <div className="p-4 border-t border-slate-100 flex flex-wrap gap-2 justify-end">
           {draft && <button type="button" onClick={onReset} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-sm">↺ Khôi phục bản tự động</button>}
-          <button type="button" onClick={() => onCopy(preview)} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-sm">📋 Sao chép</button>
+          <button type="button" onClick={() => onCopy(preview)} className="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 font-bold text-sm">📋 Sao chép chữ</button>
+          <button type="button" onClick={() => onCopyImage(previewReport)} className="px-4 py-2.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-[#0055d4] font-bold text-sm">🖼 Sao chép ảnh</button>
+          <button type="button" onClick={() => onExportImage(previewReport)} className="px-4 py-2.5 rounded-xl bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 font-bold text-sm">🖼 Xuất ảnh</button>
           <button type="button" onClick={() => onSave(toDraft())} className="px-4 py-2.5 rounded-xl bg-brand-700 hover:bg-brand-800 text-white font-black text-sm">💾 Lưu nhận xét</button>
         </div>
       </div>

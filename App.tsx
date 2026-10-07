@@ -267,14 +267,16 @@ function App() {
 
       {/* Main Workspace based on Active Role */}
       <main className="max-w-[1500px] mx-auto px-3 sm:px-6 py-6 sm:py-10 flex-grow w-full relative">
-        {currentRole === 'teacher' && currentUser.role === 'teacher' ? (
-          <TeacherDashboard
-            onOpenSettings={() => setShowSettings(true)}
-            onSwitchToStudent={() => handleRoleChange('student')}
-          />
-        ) : (
-          <StudentDashboard />
+        {/* Bảng điều khiển giáo viên được giữ lại khi "Xem giao diện HS" → bài đang soạn bằng AI không bị mất */}
+        {currentUser.role === 'teacher' && (
+          <div className={currentRole === 'teacher' ? '' : 'hidden'}>
+            <TeacherDashboard
+              onOpenSettings={() => setShowSettings(true)}
+              onSwitchToStudent={() => handleRoleChange('student')}
+            />
+          </div>
         )}
+        {(currentRole !== 'teacher' || currentUser.role !== 'teacher') && <StudentDashboard />}
       </main>
 
       {/* Thông báo có phiên bản mới (tự cập nhật lúc an toàn) */}

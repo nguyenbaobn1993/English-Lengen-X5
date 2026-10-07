@@ -441,11 +441,19 @@ export const parseScheduleFromText = (
   return { slots, formattedSummary };
 };
 
+/** Tên khối / cấp độ hiển thị của lớp */
+export const classGradeText = (c?: Pick<ClassRoom, 'grade' | 'gradeLabel'> | null): string => {
+  if (!c) return '';
+  if (c.gradeLabel && c.gradeLabel.trim()) return c.gradeLabel.trim();
+  return c.grade === 0 ? 'Mầm non' : `Khối ${c.grade}`;
+};
+
 export const addClass = (
   name: string,
   grade: number,
   description = '',
-  customSlots?: WeeklyTimeSlot[]
+  customSlots?: WeeklyTimeSlot[],
+  gradeLabel?: string
 ): ClassRoom => {
   const current = getClasses();
   const now = new Date().toISOString();
@@ -458,6 +466,7 @@ export const addClass = (
     id: `class_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
     name: trimmedName,
     grade,
+    ...(gradeLabel && gradeLabel.trim() ? { gradeLabel: gradeLabel.trim() } : {}),
     description: description.trim(),
     studentCount: 0,
     createdAt: now,

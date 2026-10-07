@@ -414,7 +414,7 @@ export const StudentLessonView: React.FC<StudentLessonViewProps> = ({
         )}
       </div>
 
-      {/* PHẦN 1: TỪ VỰNG CHUẨN GLOBAL SUCCESS (Đồng nhất 100% với bài cô soạn) */}
+      {/* PHẦN 1: TỪ VỰNG (Đồng nhất 100% với bài cô soạn) */}
       <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-xl border border-brand-100">
         <VocabularySection items={lesson.vocabulary || []} />
       </div>

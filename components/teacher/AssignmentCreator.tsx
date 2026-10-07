@@ -522,7 +522,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
               <h2 className="text-xl sm:text-2xl font-black text-brand-900">Soạn Bài Học & Giao Bài Theo Ngày</h2>
             </div>
             <p className="text-sm text-slate-500 font-medium">
-              Tạo bài học chuẩn sách Global Success bằng AI, thiết lập hạn nộp và giao bài trực tiếp tới học sinh.
+              Legend X5 AI soạn bài học theo chủ đề, thiết lập hạn nộp và giao bài trực tiếp tới học sinh.
             </p>
           </div>
         </div>
@@ -767,8 +767,8 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
                   {plannerMode === 'exam'
                     ? 'Đang phân tích & trích xuất đề thi bảo toàn gốc 100%...'
                     : loadingStage === 'core'
-                    ? 'Đang tạo lý thuyết & từ vựng chuẩn Global Success...'
-                    : 'Đang tạo bộ bài tập MegaTest 50 câu...'}
+                    ? 'Legend X5 đang soạn bài: lý thuyết & từ vựng...'
+                    : 'Legend X5 đang soạn bài: bộ bài tập MegaTest 50 câu...'}
                 </span>
               </>
             ) : (
@@ -1151,7 +1151,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
               )}
             </div>
 
-            {/* PHẦN 1: TỪ VỰNG CHUẨN GLOBAL SUCCESS (Giống hệt học sinh) */}
+            {/* PHẦN 1: TỪ VỰNG (Giống hệt học sinh) */}
             <div className="bg-white p-4 sm:p-6 rounded-3xl shadow-xl border border-brand-100">
               <VocabularySection items={lessonPlan.vocabulary || []} />
             </div>

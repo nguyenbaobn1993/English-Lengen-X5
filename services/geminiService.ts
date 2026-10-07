@@ -1088,7 +1088,7 @@ export const generateLessonPlan = async (
      - TỈ LỆ ÂM 3-1 TUYỆT ĐỐI: CHÍNH XÁC 3 từ có cùng 1 âm IPA duy nhất, và ĐÚNG 1 từ có âm khác biệt.
        * CẤM TUYỆT ĐỐI câu chia đôi 2-2 (ví dụ lỗi sai cấm: gift, give [/ɪ/] vs life, child [/aɪ/]; không có từ nào là đáp án duy nhất).
        * CẤM TUYỆT ĐỐI từ có âm thứ ba làm câu có 2 từ khác biệt (ví dụ lỗi sai cấm: lend [/e/], help [/e/], she [/iː/], pretend [/ɪ/]).
-     - HÃY ƯU TIÊN CÁC CHỦ ĐIỂM NGỮ ÂM CHUẨN MỰC SGK GLOBAL SUCCESS:
+     - HÃY ƯU TIÊN CÁC CHỦ ĐIỂM NGỮ ÂM CƠ BẢN THƯỜNG GẶP Ở CẤP TIỂU HỌC / THCS:
        + Đuôi '-ed': /t/ (stopped, looked, watched) vs /d/ (played, cleaned) vs /ɪd/ (wanted, needed, visited)
        + Đuôi '-s/-es': /s/ (books, cats, hats, cups) vs /z/ (pens, dogs, apples) vs /ɪz/ (watches, boxes, classes)
        + Phụ âm 'ch': /tʃ/ (teacher, chair, children, cheap) vs /k/ (school, chemist)

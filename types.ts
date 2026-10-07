@@ -303,7 +303,8 @@ export interface AuthUser {
 export interface ClassRoom {
   id: string;
   name: string;             // VD: "6A1", "7B2", "8A3"
-  grade: number;            // 6, 7, 8, 9, 10...
+  grade: number;            // 0 = Mầm non, 1–12; dùng gradeLabel nếu tự nhập
+  gradeLabel?: string;      // Khối / cấp độ tự nhập: "Starters", "IELTS 5.0", "Người lớn"...
   description?: string;
   studentCount?: number;
   createdAt: string;

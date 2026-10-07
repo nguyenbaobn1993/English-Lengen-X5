@@ -20,8 +20,7 @@ import {
   isStudentMatch,
   parseScheduleFromText,
   resetStudentPassword,
-  batchResetClassPasswords
-} from '../../services/assignmentService';
+  batchResetClassPasswords, classGradeText } from '../../services/assignmentService';
 import { guardDestructiveAction } from '../../services/teacherAuth';
 
 export const StudentManagement: React.FC = () => {
@@ -47,9 +46,14 @@ export const StudentManagement: React.FC = () => {
   const [showAddClass, setShowAddClass] = useState(false);
   const [newClassName, setNewClassName] = useState('');
   const [newClassGrade, setNewClassGrade] = useState(6);
+  const [newClassGradeCustom, setNewClassGradeCustom] = useState(false);
+  const [newClassGradeLabel, setNewClassGradeLabel] = useState('');
+  const [editGradeCustom, setEditGradeCustom] = useState(false);
   const [newClassDesc, setNewClassDesc] = useState('');
 
   const [editingClass, setEditingClass] = useState<ClassRoom | null>(null);
+  // Mở hộp sửa lớp: lớp có khối tự nhập thì hiện ô tự nhập
+  useEffect(() => { setEditGradeCustom(!!(editingClass && editingClass.gradeLabel && editingClass.gradeLabel.trim())); }, [editingClass?.id]);
 
   // Student single add state
   const [showAddStudent, setShowAddStudent] = useState(false);
@@ -168,8 +172,10 @@ export const StudentManagement: React.FC = () => {
     e.preventDefault();
     if (!newClassName.trim()) return;
     const parsed = parseScheduleFromText(newClassDesc);
-    const created = addClass(newClassName, newClassGrade, newClassDesc, parsed?.slots);
+    const created = addClass(newClassName, newClassGradeCustom ? 0 : newClassGrade, newClassDesc, parsed?.slots, newClassGradeCustom ? newClassGradeLabel : undefined);
     setNewClassName('');
+    setNewClassGradeCustom(false);
+    setNewClassGradeLabel('');
     setNewClassDesc('');
     setShowAddClass(false);
     setSelectedClassId(created.id);
@@ -189,6 +195,8 @@ export const StudentManagement: React.FC = () => {
       {
         name: updatedName,
         grade: editingClass.grade,
+        // Firebase không lưu undefined → dùng chuỗi rỗng để xoá khối tự nhập khi chuyển về Khối 1–12
+        gradeLabel: editGradeCustom ? (editingClass.gradeLabel || '').trim() : '',
         description: desc
       },
       parsed?.slots
@@ -660,7 +668,7 @@ export const StudentManagement: React.FC = () => {
                 <div>
                   <h4 className="font-black text-base leading-tight">{c.name}</h4>
                   <span className={`text-xs font-semibold ${isSelected ? 'text-brand-100' : 'text-slate-400'}`}>
-                    Khối {c.grade} • {count} học sinh
+                    {classGradeText(c)} • {count} học sinh
                   </span>
                   {c.description && (
                     <p className={`text-[11px] font-medium truncate max-w-[200px] mt-0.5 ${isSelected ? 'text-white/90 font-bold' : 'text-teal-700'}`}>
@@ -1042,23 +1050,31 @@ export const StudentManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Khối Lớp</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Khối Lớp / Cấp Độ</label>
                 <select
-                  value={newClassGrade}
-                  onChange={e => setNewClassGrade(Number(e.target.value))}
+                  value={newClassGradeCustom ? 'custom' : String(newClassGrade)}
+                  onChange={e => {
+                    if (e.target.value === 'custom') { setNewClassGradeCustom(true); }
+                    else { setNewClassGradeCustom(false); setNewClassGrade(Number(e.target.value)); }
+                  }}
                   className="w-full p-3 rounded-xl border border-slate-200 text-sm font-bold focus:border-brand-500 outline-none bg-white"
                 >
-                  <option value={1}>Khối 1</option>
-                  <option value={2}>Khối 2</option>
-                  <option value={3}>Khối 3</option>
-                  <option value={4}>Khối 4</option>
-                  <option value={5}>Khối 5</option>
-                  <option value={6}>Khối 6</option>
-                  <option value={7}>Khối 7</option>
-                  <option value={8}>Khối 8</option>
-                  <option value={9}>Khối 9</option>
-                  <option value={10}>Khối 10</option>
+                  <option value={0}>Mầm non</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
+                    <option key={g} value={g}>Khối {g}</option>
+                  ))}
+                  <option value="custom">✏️ Khác – tự nhập (Starters, IELTS, Người lớn...)</option>
                 </select>
+                {newClassGradeCustom && (
+                  <input
+                    type="text"
+                    required
+                    value={newClassGradeLabel}
+                    onChange={e => setNewClassGradeLabel(e.target.value)}
+                    placeholder="Nhập khối / cấp độ, VD: Starters, Movers, IELTS 5.0, Người lớn..."
+                    className="w-full mt-2 p-3 rounded-xl border border-slate-200 text-sm font-bold focus:border-brand-500 outline-none"
+                  />
+                )}
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -1137,16 +1153,31 @@ export const StudentManagement: React.FC = () => {
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-600 mb-1">Khối Lớp</label>
+                <label className="block text-xs font-bold text-slate-600 mb-1">Khối Lớp / Cấp Độ</label>
                 <select
-                  value={editingClass.grade}
-                  onChange={e => setEditingClass({ ...editingClass, grade: Number(e.target.value) })}
+                  value={editGradeCustom ? 'custom' : String(editingClass.grade)}
+                  onChange={e => {
+                    if (e.target.value === 'custom') { setEditGradeCustom(true); setEditingClass({ ...editingClass, grade: 0 }); }
+                    else { setEditGradeCustom(false); setEditingClass({ ...editingClass, grade: Number(e.target.value), gradeLabel: '' }); }
+                  }}
                   className="w-full p-3 rounded-xl border border-slate-200 text-sm font-bold focus:border-brand-500 outline-none bg-white"
                 >
+                  <option value={0}>Mầm non</option>
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(g => (
                     <option key={g} value={g}>Khối {g}</option>
                   ))}
+                  <option value="custom">✏️ Khác – tự nhập (Starters, IELTS, Người lớn...)</option>
                 </select>
+                {editGradeCustom && (
+                  <input
+                    type="text"
+                    required
+                    value={editingClass.gradeLabel || ''}
+                    onChange={e => setEditingClass({ ...editingClass, gradeLabel: e.target.value })}
+                    placeholder="Nhập khối / cấp độ, VD: Starters, Movers, IELTS 5.0, Người lớn..."
+                    className="w-full mt-2 p-3 rounded-xl border border-slate-200 text-sm font-bold focus:border-brand-500 outline-none"
+                  />
+                )}
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
@@ -1507,7 +1538,7 @@ export const StudentManagement: React.FC = () => {
                 >
                   {classes.map(c => (
                     <option key={c.id} value={c.id}>
-                      {c.name} (Khối {c.grade})
+                      {c.name} ({classGradeText(c)})
                     </option>
                   ))}
                 </select>

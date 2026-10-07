@@ -242,7 +242,8 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
       </div>
 
       {/* Tab Contents */}
-      {activeTab === 'create' && (
+      {/* Tab Soạn bài luôn được giữ lại (chỉ ẩn đi) → đang soạn bằng AI vẫn chạy tiếp khi cô chuyển sang tab khác */}
+      <div className={activeTab === 'create' ? '' : 'hidden'}>
         <AssignmentCreator
           onOpenSettings={onOpenSettings}
           onAssignmentCreated={() => setActiveTab('repository')}
@@ -250,7 +251,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
           initialAssignment={editingAssignment}
           onClearInitialAssignment={() => setEditingAssignment(null)}
         />
-      )}
+      </div>
 
       {activeTab === 'repository' && (
         <LessonRepository
