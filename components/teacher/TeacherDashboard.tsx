@@ -7,6 +7,7 @@ import { MonthlyReportAggregator } from './MonthlyReportAggregator';
 import { AnnualReportAggregator } from './AnnualReportAggregator';
 import { ScheduleAndAttendance } from './ScheduleAndAttendance';
 import { TopPerformersHonor } from './TopPerformersHonor';
+import { ZaloReportSender } from './ZaloReportSender';
 import { getClasses, getStudents, getAssignments, getSubmissions, subscribeToSync, forceCloudSyncNow } from '../../services/assignmentService';
 import { Assignment } from '../../types';
 
@@ -15,7 +16,7 @@ interface TeacherDashboardProps {
   onSwitchToStudent: () => void;
 }
 
-const VALID_TABS = ['create', 'repository', 'students', 'schedule', 'summary', 'monthly', 'annual', 'top'] as const;
+const VALID_TABS = ['create', 'repository', 'students', 'schedule', 'summary', 'monthly', 'annual', 'zalo', 'top'] as const;
 type TeacherTab = typeof VALID_TABS[number];
 
 export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettings, onSwitchToStudent }) => {
@@ -218,6 +219,17 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
         </button>
 
         <button
+          onClick={() => setActiveTab('zalo')}
+          className={`flex-1 min-w-[150px] py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
+            activeTab === 'zalo'
+              ? 'bg-gradient-to-r from-[#0068ff] to-sky-500 text-white shadow-md scale-102'
+              : 'text-slate-600 hover:bg-slate-100'
+          }`}
+        >
+          <span className="text-lg">📨</span> Gửi Nhận Xét Zalo
+        </button>
+
+        <button
           onClick={() => setActiveTab('top')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activeTab === 'top'
@@ -271,6 +283,10 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
 
       {activeTab === 'annual' && (
         <AnnualReportAggregator onBackToMonthly={() => setActiveTab('monthly')} />
+      )}
+
+      {activeTab === 'zalo' && (
+        <ZaloReportSender />
       )}
 
       {activeTab === 'top' && (

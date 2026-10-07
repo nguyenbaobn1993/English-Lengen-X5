@@ -248,7 +248,11 @@ export const buildDemoDatabase = async (): Promise<any> => {
       const raw = Math.round((4 + Math.pow(rand(), 0.6) * 6) * 10) / 10;
       const rawScore = Math.min(10, raw);
       const score = late ? Math.max(0, Math.round((rawScore - 2) * 10) / 10) : rawScore;
-      const sk = () => Math.round(Math.min(10, Math.max(0, rawScore + (rand() - 0.5) * 3)) * 10) / 10;
+      // Giống app thật: skillScores = SỐ CÂU ĐÚNG của từng phần (mỗi kỹ năng lệch nhau một chút)
+      const pr: any = a.lessonPlan?.practice || {};
+      const mg: any = pr.megaTest || {};
+      const n = (x: any) => (Array.isArray(x) ? x.length : 0);
+      const sk = (total: number) => Math.max(0, Math.min(total, Math.round(total * Math.min(1, Math.max(0, rawScore / 10 + (rand() - 0.5) * 0.35)))));
       submissions.push({
         id: `demo_sub_${ai + 1}_${s.id}`,
         assignmentId: a.id,
@@ -261,7 +265,11 @@ export const buildDemoDatabase = async (): Promise<any> => {
         score,
         totalCorrect: Math.round((rawScore / 10) * total),
         totalQuestions: total,
-        skillScores: { mc: sk(), scramble: sk(), fill: sk(), vocab: sk(), tf: sk(), listen: sk() },
+        skillScores: {
+          mc: sk(n(mg.multipleChoice)), scramble: sk(n(mg.scramble)), fill: sk(n(mg.fillBlank)), vocab: sk(n(mg.vocabTranslation)),
+          tf: sk(n(mg.trueFalse)), listen: sk(n(pr.listening)), readingMC: sk(n(mg.readingMC)), pronunciation: sk(n(mg.pronunciation)),
+          readingFill: sk(n(mg.readingFill))
+        } as any,
         evaluation: evaluation(score),
         assignmentType: 'lesson',
         ...(late ? { isLate: true, rawScore, penaltyPoints: 2 } : {}),
