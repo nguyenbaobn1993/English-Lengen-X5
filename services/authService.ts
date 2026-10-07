@@ -1,5 +1,6 @@
 import { AuthUser, UserRole } from '../types';
 import { verifyTeacherAccount, getTeacherAccount } from './teacherAccounts';
+import { isDemoMode } from './demoBoot';
 import { INITIAL_ACCOUNTS, AccountCredential } from '../accounts/credentials';
 import { verifyTeacherPassword, setTeacherPasswordOnCloud, fetchTeacherAuth } from './teacherAuth';
 
@@ -66,7 +67,14 @@ export const loginTeacher = async (
       return { success: true, user: teacherUser };
     }
     // Chưa cài mật khẩu quản trị / mất kết nối → giữ nguyên thông báo gốc
-    return { success: false, error: sub.error || res.error };
+    const baseError = sub.error || res.error;
+    if (isDemoMode()) {
+      return {
+        success: false,
+        error: `${baseError} — Bạn đang ở BẢN DEMO: chỉ dùng tài khoản demo (Legend X5 / demo, mrsly / demo). Muốn vào bản thật, bấm "Thoát demo" ở thanh vàng phía trên.`
+      };
+    }
+    return { success: false, error: baseError };
   }
   const authUser: AuthUser = {
     id: 'teacher_dung',
