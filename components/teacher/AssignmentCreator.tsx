@@ -786,7 +786,9 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
             <div className="p-3 bg-amber-50 border border-amber-300 rounded-xl text-amber-800 text-xs flex items-center gap-2">
               <span>⚠️</span>
               <span>
-                Model <strong>{fallbackInfo.fromModel}</strong> tạm thời quá tải. Hệ thống đã tự động chuyển sang <strong>{fallbackInfo.toModel}</strong> để tiếp tục xử lý mượt mà.
+                {fallbackInfo.toModel === 'AI của trung tâm'
+                  ? <>{fallbackInfo.reason}</>
+                  : <>Model <strong>{fallbackInfo.fromModel}</strong> tạm thời quá tải. Hệ thống đã tự động chuyển sang <strong>{fallbackInfo.toModel}</strong> để tiếp tục xử lý mượt mà.</>}
               </span>
             </div>
           )}

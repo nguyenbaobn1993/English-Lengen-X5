@@ -21,8 +21,8 @@ const PROVIDER_SOURCE_STORAGE = 'google_ai_provider_selection_source';
 const MODEL_STORAGE = 'mrs_dung_selected_model';
 const LEGACY_KEY_STORAGE = 'mrs_dung_api_key'; // For backward compatibility
 
-// Bản demo: khi người dùng không tự nhập key, mọi yêu cầu Gemini đi qua trạm trung chuyển /api/gemini
-// (key thật của trung tâm nằm trên máy chủ Vercel, không bao giờ xuống trình duyệt)
+// AI của trung tâm: khi máy này không nhập key riêng (bản thật lẫn bản demo), mọi yêu cầu Gemini đi qua
+// trạm trung chuyển /api/gemini (key của trung tâm nằm trên máy chủ Vercel, không bao giờ xuống trình duyệt)
 export const DEMO_PROXY_KEY = 'demo-proxy';
 export const isDemoProxyKey = (key?: string | null) => key === DEMO_PROXY_KEY;
 const demoProxyBaseUrl = () => `${window.location.origin}/api/gemini`;
@@ -57,7 +57,7 @@ export const getApiKeyForProvider = (provider: AiProvider): string => {
     localStorage.setItem(GEMINI_KEY_STORAGE, legacyKey);
     return legacyKey;
   }
-  return isDemoMode() ? DEMO_PROXY_KEY : '';
+  return DEMO_PROXY_KEY;
 };
 
 export const setApiKeyForProvider = (provider: AiProvider, key: string): void => {
@@ -170,13 +170,13 @@ const modelRank = (id: string) => {
 export const rankAvailableModels = (ids: string[]) =>
   [...new Set(ids.filter(isTextGenerationModel))].sort((a, b) => modelRank(b) - modelRank(a));
 
-export const getCachedAvailableModels = (provider: AiProvider = getAiProvider()): string[] | null => {
+export const getCachedAvailableModels = (provider: AiProvider = getAiProvider(), forKey?: string): string[] | null => {
   if (provider !== 'gemini' || typeof window === 'undefined') return null;
   try {
     const raw = localStorage.getItem(AVAILABLE_MODELS_CACHE);
     if (!raw) return null;
     const c = JSON.parse(raw) as AvailableModelsCache;
-    if (c.keyTail !== keyTail(getApiKeyForProvider('gemini'))) return null;
+    if (c.keyTail !== keyTail(forKey ?? getApiKeyForProvider('gemini'))) return null;
     return Array.isArray(c.ids) && c.ids.length ? c.ids : null;
   } catch {
     return null;
@@ -269,7 +269,7 @@ export const parseApiError = (error: any): { type: ApiErrorType; message: string
   const lower = msg.toLowerCase();
 
   // Thông báo riêng của trạm trung chuyển bản demo → hiện nguyên văn
-  const demoMsg = msg.match(/Bản demo[^"}\\]*/);
+  const demoMsg = msg.match(/(?:Bản demo|AI của trung tâm)[^"}\\]*/);
   if (demoMsg) {
     return { type: msg.includes('RESOURCE_EXHAUSTED') ? 'QUOTA_EXCEEDED' : 'PERMISSION_DENIED', message: demoMsg[0].trim() };
   }
@@ -347,10 +347,11 @@ export interface FallbackNotice {
 // Retry with model fallback strictly following api.md Section II
 export const callWithFallback = async <T>(
   fn: (model: string, client: GoogleGenAI) => Promise<T>,
-  onFallbackNotice?: (notice: FallbackNotice) => void
+  onFallbackNotice?: (notice: FallbackNotice) => void,
+  overrideKey?: string
 ): Promise<T> => {
-  const provider = getAiProvider();
-  const apiKey = getApiKeyForProvider(provider);
+  const provider = overrideKey ? 'gemini' : getAiProvider();
+  const apiKey = overrideKey || getApiKeyForProvider(provider);
   if (!apiKey) {
     throw new Error('Vui lòng cấu hình API Key trước khi sử dụng tính năng này.');
   }
@@ -363,12 +364,12 @@ export const callWithFallback = async <T>(
     ? ['gemini-2.5-flash', 'gemini-2.5-flash-lite']
     : ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.5-flash-lite', 'gemini-3.1-flash-lite', 'gemini-2.5-flash'];
 
-  // Bản demo dùng trạm trung chuyển: hỏi trước danh sách model mà key của trung tâm gọi được
-  if (isDemoProxyKey(apiKey) && !getCachedAvailableModels(provider)) {
+  // AI của trung tâm: hỏi trước danh sách model mà key của trung tâm gọi được
+  if (isDemoProxyKey(apiKey) && !getCachedAvailableModels(provider, apiKey)) {
     await fetchAvailableModels(apiKey);
   }
   // Nếu đã dò được danh sách model mà key gọi được → chỉ dùng các model đó (model chọn trước, rồi theo xếp hạng)
-  const available = getCachedAvailableModels(provider);
+  const available = getCachedAvailableModels(provider, apiKey);
   const orderedModels = available
     ? Array.from(new Set([...(available.includes(selectedModel) ? [selectedModel] : []), ...available])).slice(0, 6)
     : Array.from(new Set([selectedModel, ...defaultChain]));
@@ -382,6 +383,17 @@ export const callWithFallback = async <T>(
       const parsed = parseApiError(err);
       errorDetails.push(`[${currentModel}]: ${parsed.type} - ${parsed.message}`);
 
+      // Key riêng của máy này sai / không có quyền → tự chuyển sang AI của trung tâm
+      if ((parsed.type === 'API_KEY_INVALID' || parsed.type === 'PERMISSION_DENIED') && !isDemoProxyKey(apiKey) && provider === 'gemini') {
+        if (onFallbackNotice) {
+          onFallbackNotice({
+            fromModel: 'API key trên máy này',
+            toModel: 'AI của trung tâm',
+            reason: 'API key nhập trong Cài đặt của máy này không hợp lệ hoặc không có quyền — đã dùng AI của trung tâm. Xóa key sai trong Cài đặt để không thấy lại thông báo này.'
+          });
+        }
+        return callWithFallback(fn, onFallbackNotice, DEMO_PROXY_KEY);
+      }
       // Key sai → dừng ngay (đổi model cũng không giúp được)
       if (parsed.type === 'API_KEY_INVALID') {
         throw new Error(parsed.message);

@@ -379,12 +379,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, o
               </div>
             </div>
 
-            {isDemoMode() && (
-              <div className="p-3 rounded-2xl bg-highlight-300/20 border border-highlight-400 text-xs text-brand-900 leading-relaxed">
-                <b>🧪 Bản demo đã bật sẵn AI</b> — để trống ô key là dùng AI của trung tâm (giới hạn lượt mỗi giờ).
-                Nhập key riêng nếu muốn dùng không giới hạn.
-              </div>
-            )}
+            <div className="p-3 rounded-2xl bg-highlight-300/20 border border-highlight-400 text-xs text-brand-900 leading-relaxed">
+              <b>✨ Đã bật sẵn AI của trung tâm</b> — <b>để trống ô key</b> là dùng được ngay trên mọi máy (giới hạn lượt mỗi giờ).
+              Chỉ nhập key riêng nếu muốn dùng hạn mức của tài khoản Google khác.{isDemoMode() ? ' (Bản demo)' : ''}
+            </div>
 
             {/* Kiểm tra key & dò model */}
             {provider === 'gemini' && (

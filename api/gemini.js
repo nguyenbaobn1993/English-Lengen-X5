@@ -1,5 +1,5 @@
 /**
- * TRẠM TRUNG CHUYỂN GEMINI CHO BẢN DEMO (Vercel Serverless Function)
+ * TRẠM TRUNG CHUYỂN GEMINI – AI CỦA TRUNG TÂM (Vercel Serverless Function, dùng cho bản thật & bản demo)
  *
  * - Key Gemini nằm ở biến môi trường GEMINI_API_KEY trên Vercel, KHÔNG bao giờ gửi xuống trình duyệt.
  * - Chỉ cho phép: liệt kê model (GET v1beta/models) và tạo nội dung chữ (POST v1beta/models/<gemini-...>:generateContent).
@@ -68,19 +68,19 @@ export default async function handler(req, res) {
   const key = (process.env.GEMINI_API_KEY || '').trim();
   if (!key) {
     return googleError(res, 403, 'PERMISSION_DENIED',
-      'Bản demo chưa được cấu hình AI (thiếu GEMINI_API_KEY trên Vercel). Bạn có thể tự nhập API key của mình trong Cài đặt.');
+      'AI của trung tâm chưa được cấu hình (thiếu GEMINI_API_KEY trên Vercel). Bạn có thể tự nhập API key của mình trong Cài đặt.');
   }
 
   const isList = req.method === 'GET' && path === 'v1beta/models';
   const gen = path.match(/^v1beta\/models\/(gemini-[a-z0-9.\-]+):generateContent$/i);
   const textModel = gen && !/(tts|image|live|audio|embedding|veo|imagen)/i.test(gen[1]);
   if (!isList && !(req.method === 'POST' && textModel)) {
-    return googleError(res, 403, 'PERMISSION_DENIED', 'Bản demo chỉ hỗ trợ tạo nội dung chữ bằng Gemini.');
+    return googleError(res, 403, 'PERMISSION_DENIED', 'AI của trung tâm chỉ hỗ trợ tạo nội dung chữ bằng Gemini.');
   }
 
   if (!isList && !allow(clientIp(req))) {
     return googleError(res, 429, 'RESOURCE_EXHAUSTED',
-      'Bản demo đã dùng hết lượt AI trong giờ này (quota). Vui lòng thử lại sau hoặc nhập API key riêng trong Cài đặt.');
+      'AI của trung tâm đã dùng hết lượt trong giờ này (quota). Vui lòng thử lại sau hoặc nhập API key riêng trong Cài đặt.');
   }
 
   let body;
