@@ -952,7 +952,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
           </div>
 
           {/* Form Thiết Lập Giao Bài Cho Đề Thi Gốc */}
-          <div className="bg-gradient-to-br from-brand-50 via-white to-emerald-50 p-6 sm:p-8 rounded-3xl border-4 border-brand-300 shadow-2xl space-y-6">
+          <div className="bg-gradient-to-br from-brand-50 via-white to-sky-50 p-6 sm:p-8 rounded-3xl border-4 border-brand-300 shadow-2xl space-y-6">
             <div className="border-b border-brand-100 pb-4">
               <h4 className="font-black text-brand-900 text-xl sm:text-2xl flex items-center gap-2">
                 <span>🚀</span> THIẾT LẬP GIAO ĐỀ THI CHO HỌC SINH
@@ -1109,7 +1109,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
         return (
           <div className="space-y-8 animate-fade-in font-sans">
             {/* Thanh thông báo đồng bộ giao diện */}
-            <div className="bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="bg-gradient-to-r from-sky-600 to-sky-700 text-white rounded-3xl p-5 sm:p-6 shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-center gap-3">
                 <span className="text-3xl sm:text-4xl bg-white/20 p-2 rounded-2xl">👁️</span>
                 <div>
@@ -1222,7 +1222,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
             )}
 
             {/* Form Thiết Lập Giao Bài (Hỗ trợ chọn 1 lớp, 2 lớp, 3 lớp... hoặc Tất cả các lớp) */}
-            <div className="bg-gradient-to-br from-brand-50 via-white to-emerald-50 p-6 sm:p-8 rounded-3xl border-4 border-brand-300 shadow-2xl space-y-6">
+            <div className="bg-gradient-to-br from-brand-50 via-white to-sky-50 p-6 sm:p-8 rounded-3xl border-4 border-brand-300 shadow-2xl space-y-6">
               <div className="border-b border-brand-100 pb-4">
                 <h4 className="font-black text-brand-900 text-xl sm:text-2xl flex items-center gap-2">
                   <span>🚀</span> THIẾT LẬP GIAO BÀI TẬP CHO HỌC SINH
@@ -1663,7 +1663,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
                       <button
                         type="button"
                         onClick={() => handleAssignNextToClass(folder.id, folder.name)}
-                        className="px-4 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start sm:self-auto transform active:scale-98"
+                        className="px-4 py-2.5 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer self-start sm:self-auto transform active:scale-98"
                         title="Tự động chọn lớp này và cuộn lên trên để soạn bài học tiếp theo"
                       >
                         <span>➕</span> Giao Bài Tiếp Cho Lớp Này
@@ -1739,7 +1739,7 @@ export const AssignmentCreator: React.FC<AssignmentCreatorProps> = ({
                                 <button
                                   type="button"
                                   onClick={() => setReassignTarget(assign)}
-                                  className="w-full py-2 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-black text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                                  className="w-full py-2 px-3 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-black text-xs shadow-sm transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                                   title="Giao lại bài này cho lớp đã giao hoặc giao sang lớp mới"
                                 >
                                   <span>🔄</span> Giao Lại / Giao Lớp Mới

@@ -68,7 +68,7 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
         </button>
 
         {/* Header Banner */}
-        <div className="bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 p-6 sm:p-7 text-white text-center relative overflow-hidden">
+        <div className="bg-gradient-to-br from-sky-600 via-sky-600 to-sky-700 p-6 sm:p-7 text-white text-center relative overflow-hidden">
           {/* Background Decorative Emojis */}
           <div className="absolute -top-3 -left-3 text-5xl opacity-20 select-none pointer-events-none">🎉</div>
           <div className="absolute top-2 -right-2 text-5xl opacity-20 select-none pointer-events-none">⭐</div>
@@ -113,7 +113,7 @@ export const SubmissionSuccessModal: React.FC<SubmissionSuccessModalProps> = ({
           </div>
 
           {/* Score & Evaluation Highlight */}
-          <div className="bg-gradient-to-r from-emerald-50 via-teal-50 to-emerald-50 rounded-2xl p-5 border-2 border-emerald-200 text-center space-y-2">
+          <div className="bg-gradient-to-r from-sky-50 via-sky-50 to-sky-50 rounded-2xl p-5 border-2 border-emerald-200 text-center space-y-2">
             <p className="text-xs font-bold text-slate-500 uppercase tracking-widest">
               Kết Quả Của Em
             </p>

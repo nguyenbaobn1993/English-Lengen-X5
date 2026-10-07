@@ -318,7 +318,7 @@ export const StudentLeaderboardHonor: React.FC<StudentLeaderboardHonorProps> = (
       )}
 
       {/* Encouragement Footer */}
-      <div className="p-3 bg-gradient-to-r from-brand-50 to-emerald-50 rounded-2xl border border-brand-100 flex items-center gap-2.5 text-xs text-brand-900 font-medium">
+      <div className="p-3 bg-gradient-to-r from-brand-50 to-sky-50 rounded-2xl border border-brand-100 flex items-center gap-2.5 text-xs text-brand-900 font-medium">
         <span className="text-lg">💖</span>
         <span>
           <b>Legend X5 nhắn nhủ:</b> <i>"Connect the world — Chăm chỉ mỗi ngày, con nhất định sẽ tỏa sáng!"</i>

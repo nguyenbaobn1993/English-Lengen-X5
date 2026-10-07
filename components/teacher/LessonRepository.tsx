@@ -746,7 +746,7 @@ ${link}
           <button
             type="button"
             onClick={() => setReassignAssignment(assign)}
-            className="w-full py-2.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform active:scale-98"
+            className="w-full py-2.5 px-3 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-black text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer transform active:scale-98"
           >
             <span>🔄</span> Giao Lại Hoặc Giao Cho Lớp Khác
           </button>
@@ -948,7 +948,7 @@ export const ReassignModal: React.FC<ReassignModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/70 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-3xl max-w-2xl w-full max-h-[92vh] flex flex-col shadow-2xl border-4 border-emerald-300 overflow-hidden">
         {/* Modal Header */}
-        <div className="bg-gradient-to-r from-emerald-600 to-teal-700 p-5 sm:p-6 text-white flex items-center justify-between shrink-0">
+        <div className="bg-gradient-to-r from-sky-600 to-sky-700 p-5 sm:p-6 text-white flex items-center justify-between shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-xl shrink-0">
               🔄

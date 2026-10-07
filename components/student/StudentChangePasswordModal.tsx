@@ -141,7 +141,7 @@ export const StudentChangePasswordModal: React.FC<StudentChangePasswordModalProp
     <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-fade-in font-sans">
       <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200 animate-scale-up relative max-h-[95vh] flex flex-col">
         {/* Header */}
-        <div className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white p-5 relative shrink-0">
+        <div className="bg-gradient-to-r from-sky-600 via-sky-600 to-sky-700 text-white p-5 relative shrink-0">
           <button
             type="button"
             onClick={onClose}
@@ -371,7 +371,7 @@ export const StudentChangePasswordModal: React.FC<StudentChangePasswordModalProp
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 {isSubmitting ? (
                   <span>Đang xử lý...</span>

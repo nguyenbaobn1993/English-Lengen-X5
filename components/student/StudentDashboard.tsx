@@ -292,7 +292,7 @@ export const StudentDashboard: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-emerald-600 via-brand-600 to-teal-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-sky-600 via-brand-600 to-sky-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider mb-2">

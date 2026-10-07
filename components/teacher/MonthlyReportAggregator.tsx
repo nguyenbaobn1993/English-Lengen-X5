@@ -1544,7 +1544,7 @@ export const MonthlyReportAggregator: React.FC<MonthlyReportAggregatorProps> = (
             <button
               type="button"
               onClick={onOpenAnnualReport}
-              className="px-4 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2.5 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
               title="Chuyển sang Bảng Tổng Hợp Cả Năm (12 tháng)"
             >
               <span>🗓️</span> Tổng Hợp Cả Năm

@@ -517,7 +517,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
                   <button
                     type="button"
                     onClick={() => playGeminiTTS(currentMega.readingMCPassage!)}
-                    className="px-4 py-2 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                    className="px-4 py-2 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer"
                   >
                     <span>🔊</span> Nghe Đọc Bài Văn
                   </button>
@@ -939,7 +939,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
           <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
             {/* Reading Passage */}
             {currentMega.trueFalsePassage && (
-              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-6 md:p-8 rounded-[2rem] shadow-lg border-2 border-teal-100 mb-6">
+              <div className="bg-gradient-to-br from-sky-50 to-cyan-50 p-6 md:p-8 rounded-[2rem] shadow-lg border-2 border-teal-100 mb-6">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">📖</span>
                   <h3 className="text-lg font-black text-teal-700">Bài đọc hiểu</h3>
@@ -950,7 +950,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
               </div>
             )}
 
-            <div className="bg-gradient-to-r from-teal-500 to-cyan-600 text-white p-4 rounded-2xl text-center">
+            <div className="bg-gradient-to-r from-sky-500 to-cyan-600 text-white p-4 rounded-2xl text-center">
               <h3 className="text-lg font-black">✅ Câu hỏi True / False</h3>
               <p className="text-sm opacity-90">Đọc bài văn và chọn True (Đúng) hoặc False (Sai)</p>
             </div>
@@ -1021,7 +1021,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
           <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
             {/* Reading Passage */}
             {currentMega.trueFalsePassage && (
-              <div className="bg-gradient-to-br from-teal-50 to-cyan-50 p-6 md:p-8 rounded-[2rem] shadow-lg border-2 border-teal-100 mb-6">
+              <div className="bg-gradient-to-br from-sky-50 to-cyan-50 p-6 md:p-8 rounded-[2rem] shadow-lg border-2 border-teal-100 mb-6">
                 <div className="flex items-center gap-3 mb-4">
                   <span className="text-3xl">📖</span>
                   <h3 className="text-lg font-black text-teal-700">Bài đọc hiểu</h3>
@@ -1032,7 +1032,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
               </div>
             )}
 
-            <div className="bg-gradient-to-r from-teal-600 to-emerald-600 text-white p-4 rounded-2xl text-center">
+            <div className="bg-gradient-to-r from-sky-600 to-sky-600 text-white p-4 rounded-2xl text-center">
               <h3 className="text-lg font-black">📖 5 Câu Đọc Hiểu Điền Từ</h3>
               <p className="text-sm opacity-90">Đọc kỹ bài văn và điền từ thích hợp vào chỗ trống</p>
             </div>
@@ -1151,7 +1151,7 @@ export const MegaChallenge: React.FC<MegaChallengeProps> = ({
         {/* Listening Comprehension Section - BLANK FILLING */}
         {activeZone === 'listen' && (
           <div className="space-y-6 animate-fade-in max-w-4xl mx-auto">
-            <div className="bg-gradient-to-r from-teal-500 via-cyan-600 to-blue-600 text-white p-5 rounded-2xl mb-6 text-center shadow-lg">
+            <div className="bg-gradient-to-r from-sky-500 via-cyan-600 to-blue-600 text-white p-5 rounded-2xl mb-6 text-center shadow-lg">
               <h3 className="text-xl font-black flex items-center justify-center gap-2">
                 <span>🎧</span> Bài tập Nghe & Điền từ
               </h3>

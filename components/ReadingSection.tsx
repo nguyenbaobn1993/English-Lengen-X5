@@ -69,7 +69,7 @@ export const ReadingSection: React.FC<ReadingSectionProps> = ({ reading, onScore
   return (
     <div className="bg-white rounded-[3rem] sm:rounded-[4rem] shadow-2xl border-4 sm:border-[10px] border-brand-50 overflow-hidden mb-12 animate-fade-in font-sans">
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-brand-600 to-teal-700 p-6 sm:p-12 text-white relative">
+      <div className="bg-gradient-to-r from-brand-600 to-sky-700 p-6 sm:p-12 text-white relative">
         <div className="absolute top-6 right-6 text-6xl sm:text-7xl opacity-20 pointer-events-none">📖</div>
         <div className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/20 backdrop-blur-md rounded-full text-xs font-black uppercase tracking-wider mb-3">
           <span>🎯</span> Reading Adventure

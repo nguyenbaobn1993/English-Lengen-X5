@@ -728,7 +728,7 @@ export const StudentManagement: React.FC = () => {
 
               <button
                 onClick={handleExportStudentAccounts}
-                className="px-3.5 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5"
+                className="px-3.5 py-2.5 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-1.5"
                 title="Tải file Excel danh sách tài khoản & mật khẩu để gửi cho phụ huynh"
               >
                 <span>🔑</span> Xuất DS Tài Khoản (Excel)
@@ -1460,7 +1460,7 @@ export const StudentManagement: React.FC = () => {
             </div>
 
             {/* Banner: Ưu tiên lưu thông tin của cô */}
-            <div className="p-3 bg-gradient-to-r from-brand-50 to-emerald-50 border border-brand-200 rounded-2xl text-xs text-brand-900 flex items-start gap-2.5">
+            <div className="p-3 bg-gradient-to-r from-brand-50 to-sky-50 border border-brand-200 rounded-2xl text-xs text-brand-900 flex items-start gap-2.5">
               <span className="text-base leading-none">⭐</span>
               <p className="leading-relaxed">
                 <b>Ưu tiên tuyệt đối:</b> Mọi thông tin cô sửa trên website sẽ được hệ thống lưu lại và ưu tiên cao nhất, không bị dữ liệu cũ hoặc đồng bộ đám mây ghi đè.

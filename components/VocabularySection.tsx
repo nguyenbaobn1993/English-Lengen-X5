@@ -182,7 +182,7 @@ export const VocabularySection: React.FC<VocabularySectionProps> = ({ items = []
   return (
     <div className="space-y-5 font-sans">
       {/* ==================== AUDIO STATION BANNER ==================== */}
-      <div className="bg-gradient-to-r from-teal-800 via-brand-700 to-emerald-800 rounded-3xl p-5 sm:p-6 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-sky-800 via-brand-700 to-sky-800 rounded-3xl p-5 sm:p-6 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex flex-wrap items-center gap-2 mb-2">

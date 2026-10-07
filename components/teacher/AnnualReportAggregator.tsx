@@ -552,7 +552,7 @@ export const AnnualReportAggregator: React.FC<AnnualReportAggregatorProps> = ({ 
         <div className="border-2 border-slate-300 rounded-2xl overflow-x-auto shadow-sm bg-white">
           <table className="w-full border-collapse text-center text-xs">
             <thead>
-              <tr className="bg-gradient-to-r from-brand-700 via-brand-600 to-emerald-700 text-white font-black text-xs">
+              <tr className="bg-gradient-to-r from-brand-700 via-brand-600 to-sky-700 text-white font-black text-xs">
                 <th className="py-3 px-2 border-r border-white/20 w-[45px]">STT</th>
                 <th className="py-3 px-3 border-r border-white/20 text-left min-w-[150px]">HỌ VÀ TÊN</th>
                 <th className="py-3 px-2 border-r border-white/20 min-w-[90px]">E.NAME</th>

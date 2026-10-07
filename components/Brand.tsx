@@ -43,11 +43,13 @@ export const GoldText = ({ children, className = '' }: { children: React.ReactNo
   </span>
 );
 
+// Nền xanh hoàng gia sáng: ánh trắng-xanh ở giữa trên, ánh vàng & xanh lơ ở hai góc dưới (theo ảnh bìa Legend X5)
 export const royalBg: React.CSSProperties = {
   background:
-    'radial-gradient(1200px 400px at 80% -10%, rgba(59,130,246,.35), transparent 60%),' +
-    'radial-gradient(800px 300px at 0% 110%, rgba(245,179,1,.18), transparent 60%),' +
-    'linear-gradient(135deg,#061233 0%,#0a1a3f 45%,#0f2557 100%)'
+    'radial-gradient(900px 420px at 50% -12%, rgba(150,215,255,.55), transparent 62%),' +
+    'radial-gradient(700px 320px at 100% 105%, rgba(255,200,60,.38), transparent 60%),' +
+    'radial-gradient(650px 320px at 0% 105%, rgba(60,200,255,.35), transparent 60%),' +
+    'linear-gradient(135deg,#0b2e9e 0%,#1554e8 48%,#0c3cc0 100%)'
 };
 
 /** Ảnh bìa trượt – 16:9 trên mọi màn hình, vuốt được trên điện thoại. */
@@ -130,13 +132,13 @@ export const BrandFooter = ({ children }: { children?: React.ReactNode }) => (
   <footer className="text-white border-t-4 border-highlight-400/60 pt-12 pb-10 font-sans" style={royalBg}>
     <div className="max-w-[1500px] mx-auto px-6">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center mb-10">
-        <div className="flex flex-col items-center md:items-start gap-3 text-center md:text-left">
+        <div className="flex flex-col items-center gap-3 text-center">
           <LegendLogo className="w-20 h-20" />
           <div>
             <h3 className="text-2xl font-bold uppercase leading-none" style={{ fontFamily: "'Chakra Petch', sans-serif" }}>
               English <GoldText>Legend X5</GoldText>
             </h3>
-            <p className="text-brand-200 text-xs mt-2">Lưu Tuyền • Mrs Lý • Trang xinh • Ngọc Hà • Đăng Thương</p>
+            <p className="text-sky-100 text-xs mt-2">Lưu Tuyền • Mrs Lý • Trang xinh • Ngọc Hà • Đăng Thương</p>
           </div>
         </div>
         <div>{children}</div>

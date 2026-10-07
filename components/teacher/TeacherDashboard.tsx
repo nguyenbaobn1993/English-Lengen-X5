@@ -83,7 +83,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
   return (
     <div className="space-y-6 font-sans">
       {/* Top Banner for Teacher */}
-      <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-emerald-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-brand-700 via-brand-600 to-sky-700 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
@@ -178,7 +178,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
           onClick={() => setActiveTab('schedule')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activeTab === 'schedule'
-              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md scale-102'
+              ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-md scale-102'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -211,7 +211,7 @@ export const TeacherDashboard: React.FC<TeacherDashboardProps> = ({ onOpenSettin
           onClick={() => setActiveTab('annual')}
           className={`flex-1 min-w-[150px] py-3 px-4 rounded-xl font-black text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
             activeTab === 'annual'
-              ? 'bg-gradient-to-r from-teal-600 to-emerald-600 text-white shadow-md scale-102'
+              ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-md scale-102'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >

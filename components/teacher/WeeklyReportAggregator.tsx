@@ -615,7 +615,7 @@ export const WeeklyReportAggregator: React.FC = () => {
           <button
             onClick={handleExportImage}
             disabled={isExportingImage}
-            className="px-4 py-2.5 bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-700 hover:to-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50"
+            className="px-4 py-2.5 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md transition-all flex items-center gap-1.5 disabled:opacity-50"
           >
             <span>📸</span> {isExportingImage ? 'Đang xuất ảnh...' : 'Xuất Ảnh Báo Cáo Tuần (Gửi Zalo)'}
           </button>

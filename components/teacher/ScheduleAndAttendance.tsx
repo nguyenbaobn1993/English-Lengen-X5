@@ -526,7 +526,7 @@ export const ScheduleAndAttendance: React.FC = () => {
   return (
     <div className="space-y-6 font-sans">
       {/* Top Header Card */}
-      <div className="bg-gradient-to-r from-emerald-800 via-teal-700 to-cyan-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-sky-800 via-sky-700 to-cyan-800 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full text-xs font-bold uppercase tracking-wider mb-2">
@@ -587,7 +587,7 @@ export const ScheduleAndAttendance: React.FC = () => {
           onClick={() => setActiveTab('attendance')}
           className={`flex-1 min-w-[170px] py-3 px-4 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
             activeTab === 'attendance'
-              ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md scale-102'
+              ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-md scale-102'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -598,7 +598,7 @@ export const ScheduleAndAttendance: React.FC = () => {
           onClick={() => setActiveTab('schedule')}
           className={`flex-1 min-w-[170px] py-3 px-4 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all ${
             activeTab === 'schedule'
-              ? 'bg-gradient-to-r from-teal-600 to-cyan-600 text-white shadow-md scale-102'
+              ? 'bg-gradient-to-r from-sky-600 to-cyan-600 text-white shadow-md scale-102'
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -621,7 +621,7 @@ export const ScheduleAndAttendance: React.FC = () => {
       {activeTab === 'attendance' && (
         <div className="space-y-6">
           {/* LỚP HỌC THEO NGÀY THỰC TẾ (VÍ DỤ THỨ 4 HIỆN CÁC LỚP THỨ 4) */}
-          <div className="bg-gradient-to-br from-slate-900 via-teal-950 to-slate-900 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-teal-500/30 space-y-4">
+          <div className="bg-gradient-to-br from-brand-800 via-brand-600 to-brand-800 text-white rounded-3xl p-5 sm:p-6 shadow-xl border border-teal-500/30 space-y-4">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-teal-800/50 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-teal-500/20 border border-teal-400/30 flex items-center justify-center text-2xl shadow-inner shrink-0">
@@ -712,7 +712,7 @@ export const ScheduleAndAttendance: React.FC = () => {
                         onClick={() => setSelectedClassId(c.id)}
                         className={`text-left p-3.5 rounded-2xl border transition-all relative overflow-hidden group cursor-pointer ${
                           isSelected
-                            ? 'bg-gradient-to-br from-teal-500 to-emerald-600 border-white text-white shadow-lg ring-2 ring-teal-300 scale-102'
+                            ? 'bg-gradient-to-br from-sky-500 to-sky-600 border-white text-white shadow-lg ring-2 ring-teal-300 scale-102'
                             : 'bg-white/10 hover:bg-white/15 border-white/10 text-white hover:border-teal-400/50'
                         }`}
                       >
@@ -839,7 +839,7 @@ export const ScheduleAndAttendance: React.FC = () => {
                 </button>
                 <button
                   onClick={handleSaveAttendance}
-                  className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md active:scale-95"
+                  className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-sky-600 hover:from-sky-700 hover:to-sky-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center gap-2 transition-all shadow-md active:scale-95"
                 >
                   <span>💾</span> Lưu Điểm Danh
                 </button>
@@ -1123,7 +1123,7 @@ export const ScheduleAndAttendance: React.FC = () => {
 
               <button
                 onClick={handleSaveSchedule}
-                className="px-5 py-2.5 bg-gradient-to-r from-teal-600 to-cyan-600 hover:from-teal-700 hover:to-cyan-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
+                className="px-5 py-2.5 bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-700 hover:to-cyan-700 text-white rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md transition-all active:scale-95"
               >
                 <span>💾</span> Lưu Lịch Học Lớp
               </button>

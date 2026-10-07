@@ -253,7 +253,7 @@ export const QuestionFixModal: React.FC<QuestionFixModalProps> = ({
             onClick={() => setActiveTab('ai')}
             className={`flex-1 py-2.5 px-4 rounded-xl font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer ${
               activeTab === 'ai'
-                ? 'bg-gradient-to-r from-brand-600 to-emerald-600 text-white shadow-md'
+                ? 'bg-gradient-to-r from-brand-600 to-sky-600 text-white shadow-md'
                 : 'text-slate-600 hover:bg-white'
             }`}
           >
@@ -376,7 +376,7 @@ export const QuestionFixModal: React.FC<QuestionFixModalProps> = ({
                   type="button"
                   onClick={handleAiRegenerate}
                   disabled={isAiGenerating}
-                  className="w-full py-3.5 bg-gradient-to-r from-brand-600 to-emerald-600 hover:from-brand-700 hover:to-emerald-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-50"
+                  className="w-full py-3.5 bg-gradient-to-r from-brand-600 to-sky-600 hover:from-brand-700 hover:to-sky-700 text-white rounded-2xl font-black text-sm sm:text-base shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 disabled:opacity-50"
                 >
                   {isAiGenerating ? (
                     <>

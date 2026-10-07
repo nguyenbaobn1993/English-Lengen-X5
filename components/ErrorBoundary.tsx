@@ -52,7 +52,7 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-amber-50 flex items-center justify-center p-4 font-sans text-slate-800">
+        <div className="min-h-screen bg-gradient-to-br from-sky-50 via-sky-50 to-amber-50 flex items-center justify-center p-4 font-sans text-slate-800">
           <div className="max-w-md w-full bg-white rounded-3xl shadow-2xl border border-emerald-100 p-6 sm:p-8 text-center space-y-5 animate-fade-in">
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-amber-100 text-amber-600 rounded-3xl mx-auto flex items-center justify-center text-3xl sm:text-4xl shadow-inner">
               ⚠️
@@ -70,7 +70,7 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex flex-col gap-2.5 pt-2">
               <button
                 onClick={this.handleReset}
-                className="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 text-white rounded-2xl font-black text-sm shadow-md hover:from-emerald-700 hover:to-teal-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
+                className="w-full py-3 px-4 bg-gradient-to-r from-sky-600 to-sky-600 text-white rounded-2xl font-black text-sm shadow-md hover:from-sky-700 hover:to-sky-700 transition-all active:scale-[0.98] flex items-center justify-center gap-2"
               >
                 <span>🔄</span>
                 <span>Tải Lại Ứng Dụng</span>

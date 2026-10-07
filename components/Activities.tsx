@@ -29,7 +29,7 @@ export const Activities: React.FC<ActivitiesProps> = ({ matching, fillInBlank, f
           onClick={() => setActiveTab('matching')}
           className={`flex-1 min-w-[120px] py-2 px-4 rounded-xl text-xs font-black uppercase tracking-wide transition-all transform ${
             activeTab === 'matching' 
-              ? 'bg-gradient-to-r from-emerald-400 to-green-500 text-white shadow-lg' 
+              ? 'bg-gradient-to-r from-sky-400 to-green-500 text-white shadow-lg' 
               : 'bg-white text-slate-400 hover:bg-slate-100 hover:text-slate-600'
           }`}
         >
